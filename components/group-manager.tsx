@@ -100,7 +100,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
         
         {!showCreate && !showJoin ? (
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
+            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
               <Plus className="w-3.5 h-3.5 mr-1" /> Crear
             </Button>
             <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-sm text-xs border-[rgba(244,221,224,0.15)] text-[#f4dde0] hover:bg-[rgba(244,221,224,0.05)]">
@@ -117,7 +117,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               className="h-8 text-sm w-40 bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
+            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
               Crear
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
@@ -135,7 +135,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               className="h-8 text-sm w-28 text-center font-mono tracking-wider bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
+            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
               Unirse
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">

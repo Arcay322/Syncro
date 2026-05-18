@@ -54,13 +54,13 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           {/* Section header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Film className="w-4 h-4 text-[#f5c518]" />
-              <span className="text-[10px] tracking-[0.2em] uppercase text-[#f5c518] font-medium">Viendo ahora</span>
+              <Film className="w-4 h-4 text-[#debfc3]" />
+              <span className="text-[10px] tracking-[0.2em] uppercase text-[#debfc3] font-medium">Viendo ahora</span>
             </div>
             <Button
               onClick={() => setSearchOpen(true)}
               size="sm"
-              className="h-8 gap-1.5 rounded-md bg-transparent border border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.06)] text-[10px] tracking-wider uppercase px-3"
+              className="h-8 gap-1.5 rounded-md bg-transparent border border-[rgba(222,191,195,0.25)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] text-[10px] tracking-wider uppercase px-3"
             >
               <Plus className="w-3.5 h-3.5" />
               Agregar
@@ -76,12 +76,12 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             </div>
           ) : (
             <div className="text-center py-16 border border-dashed border-[rgba(245,197,24,0.1)] rounded-md">
-              <Film className="w-8 h-8 text-[#f5c518]/20 mx-auto mb-3" />
+              <Film className="w-8 h-8 text-[#debfc3]/20 mx-auto mb-3" />
               <p className="text-sm text-[#9b8e8f]">No estás viendo nada ahora mismo</p>
               <Button
                 variant="ghost"
                 onClick={() => setSearchOpen(true)}
-                className="mt-3 text-xs text-[#f5c518] hover:text-[#f5c518] hover:bg-[rgba(245,197,24,0.04)]"
+                className="mt-3 text-xs text-[#debfc3] hover:text-[#debfc3] hover:bg-[rgba(222,191,195,0.04)]"
               >
                 Buscar serie o película
               </Button>
@@ -123,7 +123,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               {items.slice(0, 3).map((item) => (
                 <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[rgba(245,197,24,0.05)]">
                   <div className="w-8 h-8 rounded-full bg-[#3f3133] flex items-center justify-center shrink-0">
-                    <Film className="w-3.5 h-3.5 text-[#f5c518]" />
+                    <Film className="w-3.5 h-3.5 text-[#debfc3]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#f4dde0] truncate">{item.title}</p>
@@ -149,11 +149,11 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               
               {/* Dashed circle with clapperboard */}
               <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[rgba(245,197,24,0.2)] flex items-center justify-center">
-                <Clapperboard className="w-7 h-7 text-[#f5c518]/50" />
+                <Clapperboard className="w-7 h-7 text-[#debfc3]/50" />
               </div>
               
               <Button
-                className="w-full h-10 bg-transparent border border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.06)] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
+                className="w-full h-10 bg-transparent border border-[rgba(222,191,195,0.25)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
               >
                 <span className="mr-1.5 text-xs">⊞</span>
                 Girar la bobina
@@ -182,7 +182,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           {group && (
             <div className="p-4 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40">
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-[#f5c518]" />
+                <div className="w-2 h-2 rounded-full bg-[#debfc3]" />
                 <span className="text-xs text-[#f4dde0]">Sala compartida activa</span>
               </div>
               <p className="text-[10px] text-[#9b8e8f]">{group.name}</p>

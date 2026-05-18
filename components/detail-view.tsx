@@ -339,7 +339,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
                 <Button
                   onClick={handleNextEpisode}
-                  className="gap-2 rounded-xl bg-[#f5c518] text-[#1b1012] hover:bg-[#f5c518]/90 shadow-lg shadow-[rgba(245,197,24,0.2)]"
+                  className="gap-2 rounded-xl bg-[#debfc3] text-[#1b1012] hover:bg-[#d4b5b9] shadow-lg shadow-[rgba(222,191,195,0.15)]"
                   disabled={saving}
                 >
                   <SkipForward className="w-4 h-4" />
@@ -384,7 +384,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
               size="sm"
               onClick={handleNotesSave}
               disabled={saving}
-              className="rounded-xl border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.08)]"
+              className="rounded-xl border-[rgba(222,191,195,0.2)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.08)]"
             >
               Guardar notas
             </Button>
