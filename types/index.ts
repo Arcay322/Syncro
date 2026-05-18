@@ -13,6 +13,8 @@ export interface TmdbSearchResult {
 
 export interface WatchlistItemWithTmdb {
   id: string
+  userId: string | null
+  groupId: string | null
   tmdbId: number
   mediaType: string
   title: string

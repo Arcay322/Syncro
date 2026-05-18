@@ -25,16 +25,16 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
           key={filter.value}
           onClick={() => onChange(filter.value)}
           className={cn(
-            "relative px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300",
-              value === filter.value
-              ? "text-[#1b1012] shadow-lg shadow-[rgba(245,197,24,0.15)]"
-              : "text-[#9b8e8f] hover:text-[#f4dde0] hover:bg-white/5"
+            "relative px-4 py-2 text-xs font-medium rounded-full transition-all duration-300",
+            value === filter.value
+              ? "text-[#1b1012]"
+              : "text-[#9b8e8f] hover:text-[#f4dde0]"
           )}
         >
           {value === filter.value && (
             <motion.div
               layoutId="activeFilter"
-              className="absolute inset-0 bg-[#f5c518] rounded-xl"
+              className="absolute inset-0 bg-[#f5c518] rounded-full"
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
           )}

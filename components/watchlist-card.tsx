@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getTmdbImageUrl } from "@/lib/tmdb"
-import { MoreHorizontal, Play, Check, Pause, Trash2, ChevronRight } from "lucide-react"
+import { MoreHorizontal, Play, Check, Pause, Trash2, ChevronRight, Heart } from "lucide-react"
 import type { WatchlistItemWithTmdb } from "@/types"
 
 const statusLabels: Record<string, string> = {
@@ -71,26 +71,35 @@ export function WatchlistCard({ item, onUpdate, onDelete, compact }: WatchlistCa
 
   const progressText =
     item.mediaType === "tv" && item.currentSeason && item.currentEpisode
-      ? `T${item.currentSeason}:E${item.currentEpisode}`
+      ? `T${item.currentSeason} · E${item.currentEpisode}`
       : item.currentMinute
       ? `${Math.floor(item.currentMinute / 60)}h ${item.currentMinute % 60}m`
       : null
+
+  // Decorative progress bar width (fixed for visual effect when no total known)
+  const progressWidth = item.currentEpisode
+    ? Math.min(30 + (item.currentEpisode * 7), 85)
+    : 45
 
   if (compact) {
     return (
       <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
         <Link href={`/${item.id}`} className="block group">
-          <div className="relative aspect-[2/3] overflow-hidden border border-[rgba(245,197,24,0.15)] bg-[#2c1a1d]">
+          <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-[rgba(245,197,24,0.12)] bg-[#2c1a1d]">
             <img
               src={getTmdbImageUrl(item.posterPath)}
               alt={item.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute top-2 right-2">
-              <span className="text-[9px] px-1.5 py-0.5 bg-[#f5c518] text-[#1b1012] font-medium tracking-wider uppercase">Compartido</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-2">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1b1012]/90 via-transparent to-transparent" />
+            {item.groupId && (
+              <div className="absolute top-2 right-2">
+                <span className="text-[9px] px-1.5 py-0.5 bg-[#debfc3] text-[#1b1012] font-medium tracking-wider uppercase rounded-full">
+                  Compartido
+                </span>
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 p-2.5">
               <p className="text-xs font-medium text-[#f4dde0] leading-tight line-clamp-2">{item.title}</p>
               {progressText && <p className="text-[9px] text-[#9b8e8f] mt-0.5 font-mono">{progressText}</p>}
             </div>
@@ -102,29 +111,33 @@ export function WatchlistCard({ item, onUpdate, onDelete, compact }: WatchlistCa
 
   return (
     <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
-      <div className="border border-[rgba(245,197,24,0.2)] bg-[#2c1a1d] overflow-hidden group">
-        {/* Poster */}
-        <Link href={`/${item.id}`} className="block relative aspect-[16/10] overflow-hidden">
+      <div className="border border-[rgba(245,197,24,0.15)] rounded-lg bg-[#2c1a1d] overflow-hidden group">
+        {/* Poster image */}
+        <Link href={`/${item.id}`} className="block relative aspect-[2/3] overflow-hidden">
           <img
-            src={getTmdbImageUrl(item.backdropPath || item.posterPath, "w780")}
+            src={getTmdbImageUrl(item.posterPath)}
             alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2c1a1d] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2c1a1d] via-transparent to-transparent opacity-60" />
           
           {/* Shared badge */}
-          <div className="absolute top-3 left-3">
-            <span className="text-[10px] px-2 py-1 bg-[#f5c518] text-[#1b1012] font-medium tracking-wider uppercase">Compartido</span>
-          </div>
+          {item.groupId && (
+            <div className="absolute top-3 right-3">
+              <span className="inline-flex items-center gap-1 text-[10px] px-2.5 py-1 bg-[#debfc3] text-[#1b1012] font-medium tracking-wider rounded-full">
+                <Heart className="w-3 h-3" strokeWidth={2.5} /> Compartido
+              </span>
+            </div>
+          )}
           
           {/* Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger onClick={(e) => e.preventDefault()}>
-              <div className="absolute top-3 right-3 h-7 w-7 bg-black/40 backdrop-blur flex items-center justify-center cursor-pointer hover:bg-black/60 transition-colors">
+              <div className="absolute top-3 left-3 h-7 w-7 rounded-full bg-black/30 backdrop-blur flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors">
                 <MoreHorizontal className="h-3.5 w-3.5 text-white" />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[#2c1a1d] border border-[rgba(245,197,24,0.15)] min-w-[140px]">
+            <DropdownMenuContent align="start" className="bg-[#2c1a1d] border border-[rgba(245,197,24,0.15)] min-w-[140px]">
               <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("WATCHING") }} disabled={isLoading} className="text-xs text-[#f4dde0]">
                 <Play className="mr-1.5 h-3 w-3 text-[#f5c518]" /> Viendo
               </DropdownMenuItem>
@@ -141,21 +154,29 @@ export function WatchlistCard({ item, onUpdate, onDelete, compact }: WatchlistCa
           </DropdownMenu>
         </Link>
 
-        {/* Info */}
+        {/* Content */}
         <div className="p-4">
-          <h3 className="text-base font-display font-semibold text-[#f4dde0] mb-1">{item.title}</h3>
+          <h3 className="text-sm font-display font-semibold text-[#f4dde0] mb-1 leading-tight">{item.title}</h3>
           {progressText && (
-            <p className="text-xs text-[#9b8e8f] font-mono mb-3">{progressText}</p>
+            <p className="text-[10px] text-[#9b8e8f] font-mono tracking-wider mb-3">{progressText}</p>
           )}
+          
+          {/* Progress bar */}
+          <div className="h-[2px] bg-[#3f3133] rounded-full mb-4 overflow-hidden">
+            <div 
+              className="h-full bg-[#f5c518] rounded-full transition-all duration-500" 
+              style={{ width: `${progressWidth}%` }} 
+            />
+          </div>
           
           {/* Next episode button */}
           {item.mediaType === "tv" && (
             <Button
               onClick={handleNextEpisode}
               disabled={isLoading}
-              className="w-full h-9 bg-[#f5c518] text-[#1b1012] hover:bg-[#f5c518]/90 rounded-sm text-xs font-medium tracking-wider uppercase"
+              className="w-full h-10 bg-[#debfc3] text-[#1b1012] hover:bg-[#debfc3]/90 rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
             >
-              <ChevronRight className="w-3.5 h-3.5 mr-1" />
+              <Play className="w-3 h-3 mr-1.5 fill-current" />
               Marcar siguiente capítulo
             </Button>
           )}
