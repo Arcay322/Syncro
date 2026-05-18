@@ -1,64 +1,35 @@
 import { signIn } from "@/auth"
 import { Button } from "@/components/ui/button"
-import { Film, Tv, Users } from "lucide-react"
+import { Film, Users } from "lucide-react"
 
 export default function LoginPage() {
   return (
     <div className="min-h-full flex flex-col items-center justify-center relative overflow-hidden">
       {/* Ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-amber-500/[0.03] blur-[150px] pointer-events-none" />
       
-      {/* Floating icons decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <Film className="absolute top-[20%] left-[15%] w-8 h-8 text-amber-500/10 rotate-12" />
-        <Tv className="absolute top-[30%] right-[18%] w-10 h-10 text-amber-500/10 -rotate-6" />
-        <Users className="absolute bottom-[25%] left-[20%] w-6 h-6 text-amber-500/10 rotate-3" />
-      </div>
-
-      <div className="relative z-10 flex flex-col items-center text-center gap-8 max-w-sm px-6">
+      <div className="relative z-10 flex flex-col items-center text-center gap-8 max-w-md px-6">
         {/* Logo */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <Film className="w-10 h-10 text-background" />
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 flex items-center justify-center shadow-2xl shadow-amber-500/25 ring-1 ring-amber-400/30">
+            <Film className="w-12 h-12 text-background" />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg">
-            <Users className="w-4 h-4 text-background" />
+          <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center shadow-lg ring-1 ring-amber-300/40">
+            <Users className="w-5 h-5 text-background" />
           </div>
         </div>
 
         {/* Text */}
         <div className="space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
+          <h1 className="text-5xl font-semibold tracking-tight text-foreground font-display">
             Syncro
           </h1>
-          <p className="text-muted-foreground text-base leading-relaxed">
+          <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
             Tu espacio compartido para series y películas. Lleva el registro de lo que ves junto a alguien especial.
           </p>
         </div>
 
-        {/* Features */}
-        <div className="flex gap-6 text-sm text-muted-foreground">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <Film className="w-5 h-5 text-amber-400" />
-            </div>
-            <span>Watchlist</span>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-amber-400" />
-            </div>
-            <span>Compartido</span>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <Tv className="w-5 h-5 text-amber-400" />
-            </div>
-            <span>Progreso</span>
-          </div>
-        </div>
-
-        {/* Login button */}
+        {/* Login button - glassmorphism */}
         <form
           action={async () => {
             "use server"
@@ -68,7 +39,7 @@ export default function LoginPage() {
         >
           <Button 
             type="submit" 
-            className="w-full gap-3 h-12 text-base font-medium rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all" 
+            className="w-full gap-3 h-12 text-base font-medium rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 text-white hover:bg-white/15 hover:border-white/25 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300" 
             size="lg"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -81,7 +52,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-xs text-muted-foreground/60">
+        <p className="text-xs text-muted-foreground/50">
           Inicia sesión para sincronizar tu watchlist
         </p>
       </div>
