@@ -24,7 +24,6 @@ import {
   Calendar,
   Film,
   Tv,
-  ChevronDown,
 } from "lucide-react"
 import type { WatchlistItemWithTmdb } from "@/types"
 
@@ -133,7 +132,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   return (
     <div className="space-y-8">
       {/* Backdrop Header */}
-      <div className="relative -mx-4 -mt-8 h-64 md:h-80 overflow-hidden">
+      <div className="relative -mx-4 -mt-8 h-[50vh] min-h-[350px] max-h-[500px] overflow-hidden">
         <Image
           src={getTmdbImageUrl(tmdbDetails.backdrop_path || tmdbDetails.poster_path, "original")}
           alt={item.title}
@@ -141,46 +140,57 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
+        
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-4 gap-2 -ml-2 text-white/80 hover:text-white hover:bg-white/10">
+            <Button variant="ghost" size="sm" className="mb-4 gap-2 -ml-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl">
               <ArrowLeft className="w-4 h-4" />
               Volver
             </Button>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl md:text-5xl font-bold text-white tracking-tight drop-shadow-lg"
+          >
             {item.title}
-          </h1>
-          <div className="flex items-center gap-3 mt-3 text-white/70">
-            <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
+          </motion.h1>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex items-center gap-4 mt-4"
+          >
+            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 backdrop-blur-sm">
               {isTv ? <Tv className="w-3 h-3 mr-1" /> : <Film className="w-3 h-3 mr-1" />}
               {isTv ? "Serie" : "Película"}
             </Badge>
             {tmdbDetails.vote_average > 0 && (
-              <span className="flex items-center gap-1 text-sm">
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <span className="flex items-center gap-1 text-sm text-white/80">
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                 {tmdbDetails.vote_average.toFixed(1)}
               </span>
             )}
             {tmdbDetails.release_date && (
-              <span className="flex items-center gap-1 text-sm">
+              <span className="flex items-center gap-1 text-sm text-white/80">
                 <Calendar className="w-4 h-4" />
                 {tmdbDetails.release_date.substring(0, 4)}
               </span>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[280px_1fr] gap-8">
+      <div className="grid md:grid-cols-[300px_1fr] gap-8">
         {/* Poster */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="hidden md:block"
         >
-          <div className="relative aspect-[2/3] rounded-2xl overflow-hidden shadow-lg">
+          <div className="relative aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
             <Image
               src={getTmdbImageUrl(item.posterPath)}
               alt={item.title}
@@ -194,29 +204,29 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="space-y-8"
         >
           {tmdbDetails.overview && (
             <div>
-              <h2 className="text-lg font-semibold mb-2">Sinopsis</h2>
+              <h2 className="text-lg font-semibold mb-3 text-foreground">Sinopsis</h2>
               <p className="text-muted-foreground leading-relaxed">
                 {tmdbDetails.overview}
               </p>
             </div>
           )}
 
-          {/* Status */}
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Estado</label>
+          {/* Status & Rating */}
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">Estado</label>
               <Select
                 value={currentItem.status}
                 onValueChange={handleStatusChange}
               >
-                <SelectTrigger className="w-[160px] rounded-xl">
+                <SelectTrigger className="w-[180px] rounded-xl bg-card border-border/40">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border/40">
                   {statusOptions.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
@@ -226,9 +236,8 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
               </Select>
             </div>
 
-            {/* Rating */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Tu rating</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">Tu rating</label>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                   <button
@@ -237,31 +246,31 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                     className="p-0.5 transition-transform hover:scale-110"
                   >
                     <Star
-                      className={`w-5 h-5 ${
+                      className={`w-5 h-5 transition-colors ${
                         star <= rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-muted-foreground/30"
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-muted-foreground/20"
                       }`}
                     />
                   </button>
                 ))}
-                {rating > 0 && <span className="ml-2 text-sm font-medium">{rating}/10</span>}
+                {rating > 0 && <span className="ml-2 text-sm font-semibold text-amber-400">{rating}/10</span>}
               </div>
             </div>
           </div>
 
           {/* Progress */}
-          <div className="p-6 rounded-2xl bg-muted/50 space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Play className="w-5 h-5" />
+          <div className="p-6 rounded-2xl bg-card/50 border border-border/40 space-y-6">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
+              <Play className="w-5 h-5 text-amber-400" />
               Progreso
             </h2>
 
             {isTv ? (
               <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Temporada</label>
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider">Temporada</label>
                     <Select
                       value={String(currentItem.currentSeason || selectedSeason)}
                       onValueChange={(v: string | null) => {
@@ -270,33 +279,33 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                         updateItem({ currentSeason: parseInt(v) })
                       }}
                     >
-                      <SelectTrigger className="w-[100px] rounded-xl">
+                      <SelectTrigger className="w-[120px] rounded-xl bg-card border-border/40">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-card border-border/40">
                         {seasons
                           ?.filter((s: any) => s.season_number > 0)
                           .map((s: any) => (
                             <SelectItem key={s.season_number} value={String(s.season_number)}>
-                              T{s.season_number}
+                              Temporada {s.season_number}
                             </SelectItem>
                           ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Episodio</label>
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider">Episodio</label>
                     <Select
                       value={String(currentItem.currentEpisode || "")}
                       onValueChange={(v: string | null) => {
                         if (v) handleEpisodeChange(v)
                       }}
                     >
-                      <SelectTrigger className="w-[100px] rounded-xl">
-                        <SelectValue placeholder="E" />
+                      <SelectTrigger className="w-[120px] rounded-xl bg-card border-border/40">
+                        <SelectValue placeholder="Ep." />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-card border-border/40">
                         {seasonEpisodes.length > 0
                           ? seasonEpisodes.map((ep: any) => (
                               <SelectItem key={ep.episode_number} value={String(ep.episode_number)}>
@@ -305,22 +314,23 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                             ))
                           : Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
                               <SelectItem key={n} value={String(n)}>
-                                E{n}
+                                Episodio {n}
                               </SelectItem>
                             ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Minuto</label>
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground uppercase tracking-wider">Minuto</label>
                     <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
                       <input
                         type="number"
                         min={0}
                         value={currentItem.currentMinute || ""}
                         onChange={(e) => handleMinuteChange(e.target.value)}
-                        className="w-20 h-9 px-3 rounded-xl border bg-background text-sm"
+                        className="w-24 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 outline-none transition-all"
                         placeholder="0"
                       />
                     </div>
@@ -329,7 +339,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
                 <Button
                   onClick={handleNextEpisode}
-                  className="gap-2 rounded-full"
+                  className="gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-background hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20"
                   disabled={saving}
                 >
                   <SkipForward className="w-4 h-4" />
@@ -337,9 +347,9 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">Minuto actual</label>
+              <div className="flex items-end gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Minuto actual</label>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     <input
@@ -347,7 +357,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                       min={0}
                       value={currentItem.currentMinute || ""}
                       onChange={(e) => handleMinuteChange(e.target.value)}
-                      className="w-24 h-9 px-3 rounded-xl border bg-background text-sm"
+                      className="w-28 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 outline-none transition-all"
                       placeholder="0"
                     />
                   </div>
@@ -356,25 +366,25 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             )}
 
             {saving && (
-              <p className="text-xs text-muted-foreground">Guardando...</p>
+              <p className="text-xs text-amber-400/70">Guardando...</p>
             )}
           </div>
 
           {/* Notes */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notas</label>
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-muted-foreground">Notas</label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Escribe tus notas sobre esta serie o película..."
-              className="min-h-[100px] rounded-xl resize-none"
+              className="min-h-[120px] rounded-xl resize-none bg-card border-border/40 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50"
             />
             <Button
               variant="outline"
               size="sm"
               onClick={handleNotesSave}
               disabled={saving}
-              className="rounded-full"
+              className="rounded-xl border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
             >
               Guardar notas
             </Button>
