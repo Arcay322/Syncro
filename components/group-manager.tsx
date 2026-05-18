@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Users, Plus, LogIn, Copy, Check, Sparkles } from "lucide-react"
+import { Users, Plus, LogIn, Copy, Check } from "lucide-react"
 import type { Group } from "@prisma/client"
 
 interface GroupManagerProps {
@@ -48,7 +48,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
       const data = await res.json()
       onGroupChange(data.group)
     } else {
-      alert("Código inválido o ya estás en un grupo")
+      alert("Código inválido")
     }
     setLoading(false)
   }
@@ -64,130 +64,84 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
   if (createdGroup) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-8 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20"
+        className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-4"
       >
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <Sparkles className="w-7 h-7 text-background" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-foreground">¡Sala creada!</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Comparte este código para que tu pareja se una
-            </p>
-          </div>
-          <div className="flex items-center gap-3 mt-2">
-            <code className="px-6 py-3 bg-background/50 rounded-xl font-mono text-2xl tracking-[0.2em] text-amber-400 border border-amber-500/20">
-              {createdGroup.inviteCode}
-            </code>
-            <Button 
-              size="icon" 
-              variant="outline" 
-              onClick={copyCode}
-              className="rounded-xl border-amber-500/30 text-amber-400 hover:bg-amber-500/10 h-12 w-12"
-            >
-              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-            </Button>
-          </div>
+        <Users className="w-5 h-5 text-amber-400 shrink-0" />
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-foreground">Sala creada: {createdGroup.name}</h3>
+          <p className="text-xs text-muted-foreground">Comparte el código</p>
         </div>
+        <code className="px-3 py-1.5 bg-background/50 rounded-lg font-mono text-sm text-amber-400 border border-amber-500/20 tracking-wider">
+          {createdGroup.inviteCode}
+        </code>
+        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-amber-400">
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+        </Button>
       </motion.div>
     )
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-8 rounded-2xl bg-card/50 border border-border/40"
+      className="p-4 rounded-xl bg-card/50 border border-border-soft"
     >
-      <div className="flex flex-col items-center text-center gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
-          <Users className="w-7 h-7 text-amber-400" />
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+          <Users className="w-5 h-5 text-amber-400" />
         </div>
-        <div>
-          <h3 className="text-xl font-bold text-foreground">Sala compartida</h3>
-          <p className="text-sm text-muted-foreground mt-1.5 max-w-sm leading-relaxed">
-            Crea una sala para compartir tu watchlist y llevar el progreso junto a alguien especial.
-          </p>
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-foreground">Sala compartida</h3>
+          <p className="text-xs text-muted-foreground">Comparte tu watchlist con alguien</p>
         </div>
-
-        {!showCreate && !showJoin && (
-          <div className="flex gap-3">
-            <Button 
-              onClick={() => setShowCreate(true)} 
-              className="gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-background hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20"
-            >
-              <Plus className="w-4 h-4" />
-              Crear sala
+        
+        {!showCreate && !showJoin ? (
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-background text-xs">
+              <Plus className="w-3.5 h-3.5 mr-1" /> Crear
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowJoin(true)} 
-              className="gap-2 rounded-xl border-border/40 hover:bg-white/5"
-            >
-              <LogIn className="w-4 h-4" />
-              Unirse
+            <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-lg text-xs">
+              <LogIn className="w-3.5 h-3.5 mr-1" /> Unirse
             </Button>
           </div>
-        )}
-
-        {showCreate && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="w-full max-w-sm space-y-3"
-          >
+        ) : showCreate ? (
+          <div className="flex gap-2">
             <Input
-              placeholder="Nombre de la sala (ej: Nuestra Sala)"
+              placeholder="Nombre"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-              className="h-11 rounded-xl bg-card border-border/40 focus:ring-2 focus:ring-amber-500/30"
+              className="h-8 text-sm w-40"
+              autoFocus
             />
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleCreate} 
-                disabled={loading} 
-                className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-background"
-              >
-                {loading ? "Creando..." : "Crear"}
-              </Button>
-              <Button variant="ghost" onClick={() => setShowCreate(false)} className="rounded-xl">
-                Cancelar
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {showJoin && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="w-full max-w-sm space-y-3"
-          >
+            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-lg bg-amber-500 text-xs">
+              Crear
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs">
+              Cancelar
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
             <Input
-              placeholder="Código de invitación"
+              placeholder="Código"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && handleJoin()}
               maxLength={6}
-              className="h-11 rounded-xl bg-card border-border/40 focus:ring-2 focus:ring-amber-500/30 tracking-[0.2em] text-center font-mono"
+              className="h-8 text-sm w-28 text-center font-mono tracking-wider"
+              autoFocus
             />
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleJoin} 
-                disabled={loading} 
-                className="flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-background"
-              >
-                {loading ? "Uniendo..." : "Unirse"}
-              </Button>
-              <Button variant="ghost" onClick={() => setShowJoin(false)} className="rounded-xl">
-                Cancelar
-              </Button>
-            </div>
-          </motion.div>
+            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-lg bg-amber-500 text-xs">
+              Unirse
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs">
+              Cancelar
+            </Button>
+          </div>
         )}
       </div>
     </motion.div>

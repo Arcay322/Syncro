@@ -26,7 +26,7 @@ const statusColors: Record<string, string> = {
   WATCHING: "bg-amber-500/15 text-amber-400 border-amber-500/25",
   COMPLETED: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
   ON_HOLD: "bg-yellow-500/15 text-yellow-400 border-yellow-500/25",
-  DROPPED: "bg-coral/15 text-coral border-coral/25",
+  DROPPED: "bg-red-500/15 text-red-400 border-red-500/25",
   PLAN_TO_WATCH: "bg-slate-500/15 text-slate-400 border-slate-500/25",
 }
 
@@ -39,24 +39,19 @@ interface WatchlistCardProps {
 export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) {
   const [isLoading, setIsLoading] = useState(false)
   
-  // 3D tilt
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  const mouseXSpring = useSpring(x)
-  const mouseYSpring = useSpring(y)
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"])
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"])
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 })
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 })
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"])
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"])
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const width = rect.width
-    const height = rect.height
     const mouseX = e.clientX - rect.left
     const mouseY = e.clientY - rect.top
-    const xPct = mouseX / width - 0.5
-    const yPct = mouseY / height - 0.5
-    x.set(xPct)
-    y.set(yPct)
+    x.set(mouseX / rect.width - 0.5)
+    y.set(mouseY / rect.height - 0.5)
   }
   
   const handleMouseLeave = () => {
@@ -79,7 +74,7 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
   }
 
   const handleDelete = async () => {
-    if (!confirm("¿Eliminar de tu lista?")) return
+    if (!confirm("¿Eliminar?")) return
     const res = await fetch(`/api/watchlist/${item.id}`, { method: "DELETE" })
     if (res.ok) onDelete(item.id)
   }
@@ -95,87 +90,64 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
 
   return (
     <motion.div 
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-      }}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      whileHover={{ scale: 1.03, y: -8 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      whileHover={{ scale: 1.04, y: -4 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className="group"
     >
       <Link href={`/${item.id}`} className="block">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-card shadow-xl shadow-black/50 ring-1 ring-border-strong/50">
-          {/* Poster */}
+        <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-card shadow-lg shadow-black/40">
           <img
             src={getTmdbImageUrl(item.posterPath)}
             alt={item.title}
             className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-75"
           />
           
-          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
           
-          {/* Watching glow effect - signature */}
           {isWatching && (
-            <div className="absolute inset-0 ring-2 ring-amber-500/40 ring-inset shadow-[inset_0_0_60px_rgba(245,158,11,0.2)]" />
+            <div className="absolute inset-0 ring-1 ring-amber-500/50 ring-inset" />
           )}
-          
-          {/* Shine effect on hover */}
-          <div 
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-            style={{
-              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, transparent 50%)",
-            }}
-          />
 
-          {/* Top badges */}
-          <div className="absolute top-3 left-3 right-3 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Badge variant="outline" className="bg-black/60 backdrop-blur-xl text-white border-white/10 text-[10px] font-medium">
-              {item.mediaType === "movie" ? "Película" : "Serie"}
+          <div className="absolute top-2 left-2 right-2 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <Badge variant="outline" className="bg-black/60 backdrop-blur text-white border-white/10 text-[9px] px-1.5 py-0">
+              {item.mediaType === "movie" ? "PEL" : "SER"}
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger onClick={(e) => e.preventDefault()}>
-                <div className="h-8 w-8 rounded-lg bg-black/60 backdrop-blur-xl flex items-center justify-center cursor-pointer hover:bg-black/80 transition-colors">
-                  <MoreHorizontal className="h-4 w-4 text-white" />
+                <div className="h-6 w-6 rounded-md bg-black/60 backdrop-blur flex items-center justify-center cursor-pointer hover:bg-black/80">
+                  <MoreHorizontal className="h-3 w-3 text-white" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-card border-border-medium">
-                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("WATCHING") }} disabled={isLoading}>
-                  <Play className="mr-2 h-4 w-4 text-amber-400" /> Viendo
+              <DropdownMenuContent align="end" className="bg-card border-border-soft min-w-[140px]">
+                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("WATCHING") }} disabled={isLoading} className="text-xs">
+                  <Play className="mr-1.5 h-3 w-3 text-amber-400" /> Viendo
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("COMPLETED") }} disabled={isLoading}>
-                  <Check className="mr-2 h-4 w-4 text-emerald-400" /> Terminada
+                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("COMPLETED") }} disabled={isLoading} className="text-xs">
+                  <Check className="mr-1.5 h-3 w-3 text-emerald-400" /> Terminada
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("ON_HOLD") }} disabled={isLoading}>
-                  <Pause className="mr-2 h-4 w-4 text-yellow-400" /> En pausa
+                <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("ON_HOLD") }} disabled={isLoading} className="text-xs">
+                  <Pause className="mr-1.5 h-3 w-3 text-yellow-400" /> En pausa
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => { e.preventDefault(); handleDelete() }}
-                  className="text-coral focus:text-coral"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                <DropdownMenuItem onClick={(e) => { e.preventDefault(); handleDelete() }} className="text-red-400 focus:text-red-400 text-xs">
+                  <Trash2 className="mr-1.5 h-3 w-3" /> Eliminar
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
-          {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <h3 className="font-semibold text-sm text-white leading-tight line-clamp-2 drop-shadow-lg">
+          <div className="absolute bottom-0 left-0 right-0 p-2">
+            <h3 className="font-medium text-xs text-white leading-tight line-clamp-2 drop-shadow-lg">
               {item.title}
             </h3>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge
-                variant="outline"
-                className={`text-[10px] px-2 py-0.5 font-medium border ${statusColors[item.status] || ""}`}
-              >
+            <div className="flex items-center gap-1.5 mt-1">
+              <Badge variant="outline" className={`text-[9px] px-1.5 py-0 font-medium border ${statusColors[item.status] || ""}`}>
                 {statusLabels[item.status] || item.status}
               </Badge>
               {progressText && (
-                <span className="text-[10px] text-white/70 font-mono">{progressText}</span>
+                <span className="text-[9px] text-white/60 font-mono">{progressText}</span>
               )}
             </div>
           </div>

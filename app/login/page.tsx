@@ -4,32 +4,32 @@ import { Film, Users } from "lucide-react"
 
 export default function LoginPage() {
   return (
-    <div className="min-h-full flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="h-full flex items-center justify-center relative overflow-hidden px-4">
       {/* Ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-amber-500/[0.03] blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-amber-500/[0.04] blur-[120px] pointer-events-none" />
       
-      <div className="relative z-10 flex flex-col items-center text-center gap-8 max-w-md px-6">
+      <div className="relative z-10 flex flex-col items-center text-center gap-6 w-full max-w-sm">
         {/* Logo */}
         <div className="relative">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 flex items-center justify-center shadow-2xl shadow-amber-500/25 ring-1 ring-amber-400/30">
-            <Film className="w-12 h-12 text-background" />
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/20">
+            <Film className="w-10 h-10 text-background" />
           </div>
-          <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center shadow-lg ring-1 ring-amber-300/40">
-            <Users className="w-5 h-5 text-background" />
+          <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-lg bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center shadow-md">
+            <Users className="w-4 h-4 text-background" />
           </div>
         </div>
 
         {/* Text */}
-        <div className="space-y-3">
-          <h1 className="text-5xl font-semibold tracking-tight text-foreground font-display">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground font-display">
             Syncro
           </h1>
-          <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
-            Tu espacio compartido para series y películas. Lleva el registro de lo que ves junto a alguien especial.
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Tu espacio compartido para series y películas
           </p>
         </div>
 
-        {/* Login button - glassmorphism */}
+        {/* Login button */}
         <form
           action={async () => {
             "use server"
@@ -39,10 +39,10 @@ export default function LoginPage() {
         >
           <Button 
             type="submit" 
-            className="w-full gap-3 h-12 text-base font-medium rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 text-white hover:bg-white/15 hover:border-white/25 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-300" 
+            className="w-full gap-3 h-11 text-sm font-medium rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white hover:bg-white/15 transition-all" 
             size="lg"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -51,10 +51,6 @@ export default function LoginPage() {
             Continuar con Google
           </Button>
         </form>
-
-        <p className="text-xs text-muted-foreground/50">
-          Inicia sesión para sincronizar tu watchlist
-        </p>
       </div>
     </div>
   )
