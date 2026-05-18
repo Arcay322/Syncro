@@ -1,51 +1,91 @@
 import { signIn } from "@/auth"
 import { Button } from "@/components/ui/button"
-import { Film } from "lucide-react"
+import { Diamond, Mail, Lock, Ticket } from "lucide-react"
 
 export default function LoginPage() {
   return (
-    <div className="h-full flex items-center justify-center relative overflow-hidden px-4">
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#f5c518]/[0.03] blur-[100px] pointer-events-none" />
-      
-      <div className="relative z-10 flex flex-col items-center text-center gap-6 w-full max-w-sm">
-        {/* Logo */}
-        <div className="w-16 h-16 rounded-md bg-[#f5c518] flex items-center justify-center shadow-lg shadow-[rgba(245,197,24,0.1)]">
-          <Film className="w-8 h-8 text-[#1b1012]" />
+    <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-4 bg-[#1b1012]">
+      {/* Top Logo */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="relative">
+          <Diamond className="w-5 h-5 text-[#f5c518]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#1b1012]" />
+          </div>
         </div>
+        <span className="font-display text-lg font-semibold tracking-[0.2em] text-[#f5c518] uppercase">Syncro</span>
+        <div className="h-[2px] w-16 bg-gradient-to-r from-transparent via-[#f5c518] to-transparent absolute -bottom-1 left-1/2 -translate-x-1/2" />
+      </div>
 
-        {/* Text */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-[#f4dde0] font-display">
-            Syncro
-          </h1>
-          <p className="text-[#9b8e8f] text-sm leading-relaxed">
-            Tu espacio compartido para series y películas
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-sm">
+        {/* Card border glow */}
+        <div className="absolute -inset-[1px] bg-gradient-to-b from-[rgba(245,197,24,0.15)] to-transparent rounded-lg opacity-50" />
+        
+        <div className="relative bg-[#2c1a1d]/80 border border-[rgba(245,197,24,0.08)] rounded-lg p-8">
+          {/* Select Profile */}
+          <h2 className="text-center text-sm font-display font-semibold text-[#f4dde0] mb-6 tracking-wide">
+            Select Profile
+          </h2>
+
+          {/* Profile avatars */}
+          <div className="flex items-center justify-center gap-6 mb-6">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-14 h-14 rounded-full border-2 border-[rgba(245,197,24,0.3)] overflow-hidden bg-[#3f3133] flex items-center justify-center">
+                <span className="text-lg font-display text-[#f4dde0]">A</span>
+              </div>
+              <span className="text-[10px] text-[#9b8e8f] tracking-wider">Arnie</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-14 h-14 rounded-full border-2 border-[rgba(245,197,24,0.3)] overflow-hidden bg-[#3f3133] flex items-center justify-center">
+                <span className="text-lg font-display text-[#f4dde0]">E</span>
+              </div>
+              <span className="text-[10px] text-[#9b8e8f] tracking-wider">Ella</span>
+            </div>
+          </div>
+
+          {/* Private Access divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[rgba(245,197,24,0.2)]" />
+            <div className="flex items-center gap-1.5">
+              <Diamond className="w-2 h-2 text-[#f5c518]" />
+              <span className="text-[8px] tracking-[0.2em] uppercase text-[#f5c518]">Private Access</span>
+              <Diamond className="w-2 h-2 text-[#f5c518]" />
+            </div>
+            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[rgba(245,197,24,0.2)]" />
+          </div>
+
+          {/* Google Auth Button styled as Enter the Theater */}
+          <form
+            action={async () => {
+              "use server"
+              await signIn("google", { redirectTo: "/" })
+            }}
+          >
+            <Button 
+              type="submit" 
+              className="w-full h-11 gap-2 text-xs font-semibold tracking-[0.1em] uppercase rounded-md bg-[#f5c518] text-[#1b1012] hover:bg-[#e6b800] transition-colors" 
+            >
+              <Ticket className="w-4 h-4" />
+              Enter the Theater
+            </Button>
+          </form>
+
+          {/* Google hint */}
+          <p className="text-center text-[9px] text-[#9b8e8f] mt-3 tracking-wider">
+            Continue with Google
           </p>
         </div>
+      </div>
 
-        {/* Login button */}
-        <form
-          action={async () => {
-            "use server"
-            await signIn("google", { redirectTo: "/" })
-          }}
-          className="w-full"
-        >
-          <Button 
-            type="submit" 
-            className="w-full gap-3 h-11 text-sm font-medium rounded-md bg-[#2c1a1d] border border-[rgba(245,197,24,0.15)] text-[#f4dde0] hover:bg-[#3f3133] transition-all" 
-            size="lg"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Continuar con Google
-          </Button>
-        </form>
+      {/* Footer */}
+      <div className="absolute bottom-8 flex items-center gap-6">
+        <span className="text-[9px] tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] cursor-pointer transition-colors">
+          Archives
+        </span>
+        <span className="text-[9px] tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] cursor-pointer transition-colors">
+          Support
+        </span>
       </div>
     </div>
   )
