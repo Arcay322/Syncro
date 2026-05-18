@@ -26,12 +26,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-gold: var(--gold);
-  --color-gold-dim: var(--gold-dim);
-  --color-velvet: var(--velvet);
-  --color-velvet-light: var(--velvet-light);
-  --color-cream: var(--cream);
-  --color-cream-dim: var(--cream-dim);
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
@@ -42,25 +36,25 @@
 :root {
   --radius: 0.5rem;
   
-  /* Base: deep velvet burgundy */
+  /* Base palette from Stitch mockup */
   --background: #1b1012;
   --foreground: #f4dde0;
   
-  /* Surfaces */
+  /* Surfaces - borgoña */
   --card: #2c1a1d;
   --card-foreground: #f4dde0;
   --popover: #2c1a1d;
   --popover-foreground: #f4dde0;
   
-  /* Primary: polished gold */
+  /* Primary: gold */
   --primary: #f5c518;
   --primary-foreground: #1b1012;
   
-  /* Secondary: warm mauve */
+  /* Secondary: mauve/beige */
   --secondary: #debfc3;
   --secondary-foreground: #1b1012;
   
-  /* Muted: soft taupe */
+  /* Muted: taupe */
   --muted: #3f3133;
   --muted-foreground: #9b8e8f;
   
@@ -71,17 +65,9 @@
   /* Destructive: warm red */
   --destructive: #ffb4ab;
   
-  /* Custom tokens */
-  --gold: #f5c518;
-  --gold-dim: rgba(245, 197, 24, 0.15);
-  --velvet: #2c1a1d;
-  --velvet-light: #3f3133;
-  --cream: #f4dde0;
-  --cream-dim: rgba(244, 221, 224, 0.6);
-  
-  /* Borders: thin gold lines */
-  --border: rgba(245, 197, 24, 0.12);
-  --input: rgba(244, 221, 224, 0.08);
+  /* Borders: subtle gold lines */
+  --border: rgba(245, 197, 24, 0.1);
+  --input: rgba(244, 221, 224, 0.06);
   --ring: #f5c518;
 }
 
@@ -101,14 +87,8 @@
   --accent: #574144;
   --accent-foreground: #f4dde0;
   --destructive: #ffb4ab;
-  --gold: #f5c518;
-  --gold-dim: rgba(245, 197, 24, 0.15);
-  --velvet: #2c1a1d;
-  --velvet-light: #3f3133;
-  --cream: #f4dde0;
-  --cream-dim: rgba(244, 221, 224, 0.6);
-  --border: rgba(245, 197, 24, 0.12);
-  --input: rgba(244, 221, 224, 0.08);
+  --border: rgba(245, 197, 24, 0.1);
+  --input: rgba(244, 221, 224, 0.06);
   --ring: #f5c518;
 }
 
@@ -118,26 +98,26 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body), serif;
+    font-family: var(--font-body), Georgia, serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display), serif;
+    font-family: var(--font-display), Georgia, serif;
   }
 }
 
-/* Custom scrollbar - warm gold */
+/* Custom scrollbar - warm gold thin */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: #1b1012;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 197, 24, 0.2);
-  border-radius: 10px;
+  background: rgba(245, 197, 24, 0.15);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 197, 24, 0.4);
+  background: rgba(245, 197, 24, 0.3);
 }
 
 /* Art Deco divider */
@@ -152,21 +132,19 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.4), transparent);
-}
-.deco-divider::before {
-  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.4));
-}
-.deco-divider::after {
-  background: linear-gradient(90deg, rgba(245, 197, 24, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.35), transparent);
 }
 
-/* Gold glow effect */
-.gold-glow {
-  box-shadow: 0 0 20px rgba(245, 197, 24, 0.15), 0 0 40px rgba(245, 197, 24, 0.05);
+/* Thin gold line separator */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.2), transparent);
 }
 
-/* Velvet surface */
-.velvet-surface {
-  background: linear-gradient(135deg, #2c1a1d 0%, #241418 100%);
+/* Card glow on hover */
+.card-glow {
+  transition: box-shadow 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(245, 197, 24, 0.08);
 }

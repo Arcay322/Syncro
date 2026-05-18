@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { WatchlistCard } from "./watchlist-card"
 import { SearchCommand } from "./search-command"
 import { StatusFilter } from "./status-filter"
 import { Button } from "@/components/ui/button"
-import { Plus, Film, Clapperboard, BarChart3 } from "lucide-react"
+import { Plus, Film, Clapperboard } from "lucide-react"
 import type { WatchlistItemWithTmdb } from "@/types"
 import type { Group } from "@prisma/client"
 
@@ -37,9 +37,9 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
   const watchingItems = items.filter((i) => i.status === "WATCHING")
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-14">
         <p className="text-[10px] tracking-[0.3em] uppercase text-[#9b8e8f] mb-3 font-medium">Nosotros y Series</p>
         <h1 className="text-3xl md:text-4xl font-display font-semibold text-[#f4dde0] tracking-tight">
           Nuestro sofá, nuestras series
@@ -47,7 +47,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
         <div className="deco-divider mt-5 max-w-md mx-auto" />
       </div>
 
-      {/* Main grid - 2/3 content + 1/3 sidebar */}
+      {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left content - 2 cols */}
         <div className="lg:col-span-2 space-y-8">
@@ -60,14 +60,14 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             <Button
               onClick={() => setSearchOpen(true)}
               size="sm"
-              className="h-8 gap-1.5 rounded-md bg-transparent border border-[rgba(245,197,24,0.25)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.08)] text-[10px] tracking-wider uppercase px-3"
+              className="h-8 gap-1.5 rounded-md bg-transparent border border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.06)] text-[10px] tracking-wider uppercase px-3"
             >
               <Plus className="w-3.5 h-3.5" />
               Agregar
             </Button>
           </div>
 
-          {/* Watching cards - row of portrait cards */}
+          {/* Watching cards */}
           {watchingItems.length > 0 ? (
             <div className="grid grid-cols-2 gap-5">
               {watchingItems.map((item) => (
@@ -75,13 +75,13 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 border border-dashed border-[rgba(245,197,24,0.12)] rounded-lg">
+            <div className="text-center py-16 border border-dashed border-[rgba(245,197,24,0.1)] rounded-md">
               <Film className="w-8 h-8 text-[#f5c518]/20 mx-auto mb-3" />
               <p className="text-sm text-[#9b8e8f]">No estás viendo nada ahora mismo</p>
               <Button
                 variant="ghost"
                 onClick={() => setSearchOpen(true)}
-                className="mt-3 text-xs text-[#f5c518] hover:text-[#f5c518] hover:bg-[rgba(245,197,24,0.06)]"
+                className="mt-3 text-xs text-[#f5c518] hover:text-[#f5c518] hover:bg-[rgba(245,197,24,0.04)]"
               >
                 Buscar serie o película
               </Button>
@@ -121,7 +121,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             </div>
             <div className="space-y-3">
               {items.slice(0, 3).map((item) => (
-                <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[rgba(245,197,24,0.06)]">
+                <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[rgba(245,197,24,0.05)]">
                   <div className="w-8 h-8 rounded-full bg-[#3f3133] flex items-center justify-center shrink-0">
                     <Film className="w-3.5 h-3.5 text-[#f5c518]" />
                   </div>
@@ -143,17 +143,17 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
         {/* Right sidebar - 1 col */}
         <div className="space-y-6">
           {/* Roulette */}
-          <div className="p-6 border border-[rgba(245,197,24,0.12)] rounded-lg bg-[#2c1a1d]/50 relative overflow-hidden">
+          <div className="p-6 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40 relative overflow-hidden">
             <div className="text-center relative z-10">
               <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-5">La ruleta del destino</p>
               
               {/* Dashed circle with clapperboard */}
-              <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[rgba(245,197,24,0.25)] flex items-center justify-center">
-                <Clapperboard className="w-7 h-7 text-[#f5c518]/60" />
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[rgba(245,197,24,0.2)] flex items-center justify-center">
+                <Clapperboard className="w-7 h-7 text-[#f5c518]/50" />
               </div>
               
               <Button
-                className="w-full h-10 bg-transparent border border-[rgba(245,197,24,0.25)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.08)] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
+                className="w-full h-10 bg-transparent border border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.06)] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
               >
                 <span className="mr-1.5 text-xs">⊞</span>
                 Girar la bobina
@@ -162,7 +162,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           </div>
 
           {/* Stats */}
-          <div className="p-6 border border-[rgba(245,197,24,0.12)] rounded-lg bg-[#2c1a1d]/50">
+          <div className="p-6 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40">
             <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-6 text-center">Estadísticas juntos</p>
             <div className="text-center mb-5">
               <p className="text-4xl font-display font-bold text-[#f5c518]">{items.length}</p>
@@ -180,7 +180,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
 
           {/* Shared status */}
           {group && (
-            <div className="p-4 border border-[rgba(245,197,24,0.12)] rounded-lg bg-[#2c1a1d]/50">
+            <div className="p-4 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-2 h-2 rounded-full bg-[#f5c518]" />
                 <span className="text-xs text-[#f4dde0]">Sala compartida activa</span>
@@ -192,7 +192,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
       </div>
 
       {/* Footer */}
-      <footer className="mt-20 pt-8 border-t border-[rgba(245,197,24,0.08)]">
+      <footer className="mt-20 pt-8 border-t border-[rgba(245,197,24,0.06)]">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-display text-sm font-semibold tracking-[0.15em] text-[#f4dde0] uppercase">Syncro</span>

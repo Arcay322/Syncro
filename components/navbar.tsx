@@ -2,13 +2,14 @@
 
 import { signOut } from "next-auth/react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Diamond } from "lucide-react"
+import { LogOut, Diamond } from "lucide-react"
 
 interface NavbarProps {
   user: {
@@ -34,47 +35,56 @@ function getAvatarColor(name: string | null): string {
 }
 
 export function Navbar({ user }: NavbarProps) {
+  const pathname = usePathname()
   const initials = getInitials(user?.name || null)
   const avatarBg = getAvatarColor(user?.name || null)
 
+  const navLinks = [
+    { href: "/", label: "Dashboard" },
+    { href: "#", label: "Series" },
+    { href: "#", label: "Películas" },
+    { href: "#", label: "Estadísticas" },
+  ]
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(245,197,24,0.08)] bg-[#1b1012]/95 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(245,197,24,0.06)] bg-[#1b1012]/95 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex items-center gap-1.5">
-            <Diamond className="w-3.5 h-3.5 text-[#f5c518]" />
-            <span className="font-display text-sm font-semibold tracking-[0.2em] text-[#f4dde0] uppercase">Syncro</span>
-            <Diamond className="w-3.5 h-3.5 text-[#f5c518]" />
-          </div>
+        <Link href="/" className="flex items-center gap-1.5">
+          <Diamond className="w-3 h-3 text-[#f5c518]" />
+          <span className="font-display text-xs font-semibold tracking-[0.25em] text-[#f5c518] uppercase">Syncro</span>
         </Link>
 
         {/* Center nav links */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="/" className="text-[10px] font-medium tracking-[0.15em] uppercase text-[#f5c518]">
-            Dashboard
-          </Link>
-          <Link href="/?filter=tv" className="text-[10px] font-medium tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] transition-colors">
-            Series
-          </Link>
-          <Link href="/?filter=movie" className="text-[10px] font-medium tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] transition-colors">
-            Películas
-          </Link>
-          <span className="text-[10px] font-medium tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] transition-colors cursor-pointer">
-            Calendario
-          </span>
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href || (link.href === "/" && pathname === "/")
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`text-[10px] font-medium tracking-[0.15em] uppercase transition-colors ${
+                  isActive
+                    ? "text-[#f5c518]"
+                    : "text-[#9b8e8f] hover:text-[#f4dde0]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* User profile */}
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="relative h-8 w-8 rounded-full cursor-pointer ring-2 ring-[rgba(245,197,24,0.2)] hover:ring-[rgba(245,197,24,0.5)] transition-all overflow-hidden">
+              <div className="relative h-7 w-7 rounded-full cursor-pointer ring-1 ring-[rgba(245,197,24,0.25)] hover:ring-[rgba(245,197,24,0.5)] transition-all overflow-hidden">
                 {user.image ? (
-                  <img src={user.image} alt={user.name || "User"} className="h-8 w-8 rounded-full object-cover" />
+                  <img src={user.image} alt={user.name || "User"} className="h-7 w-7 rounded-full object-cover" />
                 ) : (
                   <div 
-                    className="h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
                     style={{ backgroundColor: avatarBg }}
                   >
                     {initials}
@@ -82,13 +92,13 @@ export function Navbar({ user }: NavbarProps) {
                 )}
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-[#2c1a1d] border border-[rgba(245,197,24,0.12)] rounded-lg">
-              <div className="px-3 py-2.5">
+            <DropdownMenuContent align="end" className="w-48 bg-[#2c1a1d] border border-[rgba(245,197,24,0.1)] rounded-md">
+              <div className="px-3 py-2">
                 <p className="text-sm font-medium text-[#f4dde0] font-display">{user.name}</p>
                 <p className="text-[10px] text-[#9b8e8f] mt-0.5">{user.email}</p>
               </div>
               <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })} className="text-[#ffb4ab] focus:text-[#ffb4ab] cursor-pointer text-xs">
-                <LogOut className="mr-2 h-3.5 w-3.5" />
+                <LogOut className="mr-2 h-3 w-3" />
                 Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -28,7 +28,7 @@ export default async function Home() {
   return (
     <>
       <Navbar user={user} />
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6">
+      <main className="flex-1 w-full">
         <Dashboard
           initialItems={personalItems}
           group={groupMember?.group || null}

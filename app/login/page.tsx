@@ -1,30 +1,25 @@
 import { signIn } from "@/auth"
 import { Button } from "@/components/ui/button"
-import { Film, Users } from "lucide-react"
+import { Film } from "lucide-react"
 
 export default function LoginPage() {
   return (
     <div className="h-full flex items-center justify-center relative overflow-hidden px-4">
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#f5c518]/[0.04] blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#f5c518]/[0.03] blur-[100px] pointer-events-none" />
       
       <div className="relative z-10 flex flex-col items-center text-center gap-6 w-full max-w-sm">
         {/* Logo */}
-        <div className="relative">
-          <div className="w-20 h-20 rounded-sm bg-[#f5c518] flex items-center justify-center shadow-xl shadow-[rgba(245,197,24,0.15)]">
-            <Film className="w-10 h-10 text-[#1b1012]" />
-          </div>
-          <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-sm bg-[#f4dde0] flex items-center justify-center shadow-md">
-            <Users className="w-4 h-4 text-[#1b1012]" />
-          </div>
+        <div className="w-16 h-16 rounded-md bg-[#f5c518] flex items-center justify-center shadow-lg shadow-[rgba(245,197,24,0.1)]">
+          <Film className="w-8 h-8 text-[#1b1012]" />
         </div>
 
         {/* Text */}
         <div className="space-y-2">
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground font-display">
+          <h1 className="text-3xl font-semibold tracking-tight text-[#f4dde0] font-display">
             Syncro
           </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <p className="text-[#9b8e8f] text-sm leading-relaxed">
             Tu espacio compartido para series y películas
           </p>
         </div>
@@ -39,7 +34,7 @@ export default function LoginPage() {
         >
           <Button 
             type="submit" 
-            className="w-full gap-3 h-11 text-sm font-medium rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-white hover:bg-white/15 transition-all" 
+            className="w-full gap-3 h-11 text-sm font-medium rounded-md bg-[#2c1a1d] border border-[rgba(245,197,24,0.15)] text-[#f4dde0] hover:bg-[#3f3133] transition-all" 
             size="lg"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
