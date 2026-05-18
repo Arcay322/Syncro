@@ -97,7 +97,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+                className="grid grid-cols-2 md:grid-cols-3 gap-5"
               >
                 {filteredItems.map((item, index) => (
                   <motion.div
@@ -106,7 +106,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.04 }}
                   >
-                    <WatchlistCard item={item} onUpdate={handleItemUpdate} onDelete={handleItemDelete} compact />
+                    <WatchlistCard item={item} onUpdate={handleItemUpdate} onDelete={handleItemDelete} />
                   </motion.div>
                 ))}
               </motion.div>
