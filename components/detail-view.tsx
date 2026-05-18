@@ -163,13 +163,13 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             transition={{ delay: 0.1 }}
             className="flex items-center gap-4 mt-4"
           >
-            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 backdrop-blur-sm">
+            <Badge className="bg-[rgba(245,197,24,0.15)] text-[#f5c518] border-[rgba(245,197,24,0.2)] backdrop-blur-sm">
               {isTv ? <Tv className="w-3 h-3 mr-1" /> : <Film className="w-3 h-3 mr-1" />}
               {isTv ? "Serie" : "Película"}
             </Badge>
             {tmdbDetails.vote_average > 0 && (
               <span className="flex items-center gap-1 text-sm text-white/80">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <Star className="w-4 h-4 text-[#f5c518] fill-[#f5c518]" />
                 {tmdbDetails.vote_average.toFixed(1)}
               </span>
             )}
@@ -248,13 +248,13 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                     <Star
                       className={`w-5 h-5 transition-colors ${
                         star <= rating
-                          ? "text-amber-400 fill-amber-400"
-                          : "text-muted-foreground/20"
+                          ? "text-[#f5c518] fill-[#f5c518]"
+                          : "text-[#9b8e8f]/20"
                       }`}
                     />
                   </button>
                 ))}
-                {rating > 0 && <span className="ml-2 text-sm font-semibold text-amber-400">{rating}/10</span>}
+                {rating > 0 && <span className="ml-2 text-sm font-semibold text-[#f5c518]">{rating}/10</span>}
               </div>
             </div>
           </div>
@@ -262,7 +262,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           {/* Progress */}
           <div className="p-6 rounded-2xl bg-card/50 border border-border/40 space-y-6">
             <h2 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-              <Play className="w-5 h-5 text-amber-400" />
+              <Play className="w-5 h-5 text-[#f5c518]" />
               Progreso
             </h2>
 
@@ -330,7 +330,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                         min={0}
                         value={currentItem.currentMinute || ""}
                         onChange={(e) => handleMinuteChange(e.target.value)}
-                        className="w-24 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 outline-none transition-all"
+                        className="w-24 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-[#f5c518]/30 focus:border-[#f5c518]/50 outline-none transition-all"
                         placeholder="0"
                       />
                     </div>
@@ -339,7 +339,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
                 <Button
                   onClick={handleNextEpisode}
-                  className="gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-background hover:from-amber-300 hover:to-amber-400 shadow-lg shadow-amber-500/20"
+                  className="gap-2 rounded-xl bg-[#f5c518] text-[#1b1012] hover:bg-[#f5c518]/90 shadow-lg shadow-[rgba(245,197,24,0.2)]"
                   disabled={saving}
                 >
                   <SkipForward className="w-4 h-4" />
@@ -357,7 +357,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                       min={0}
                       value={currentItem.currentMinute || ""}
                       onChange={(e) => handleMinuteChange(e.target.value)}
-                      className="w-28 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 outline-none transition-all"
+                      className="w-28 h-10 px-3 rounded-xl border border-border/40 bg-card text-sm focus:ring-2 focus:ring-[#f5c518]/30 focus:border-[#f5c518]/50 outline-none transition-all"
                       placeholder="0"
                     />
                   </div>
@@ -366,7 +366,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             )}
 
             {saving && (
-              <p className="text-xs text-amber-400/70">Guardando...</p>
+              <p className="text-xs text-[#f5c518]/70">Guardando...</p>
             )}
           </div>
 
@@ -377,14 +377,14 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Escribe tus notas sobre esta serie o película..."
-              className="min-h-[120px] rounded-xl resize-none bg-card border-border/40 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50"
+              className="min-h-[120px] rounded-xl resize-none bg-card border-border/40 focus:ring-2 focus:ring-[#f5c518]/30 focus:border-[#f5c518]/50"
             />
             <Button
               variant="outline"
               size="sm"
               onClick={handleNotesSave}
               disabled={saving}
-              className="rounded-xl border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+              className="rounded-xl border-[rgba(245,197,24,0.2)] text-[#f5c518] hover:bg-[rgba(245,197,24,0.08)]"
             >
               Guardar notas
             </Button>

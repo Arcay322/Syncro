@@ -6,16 +6,16 @@ export default function LoginPage() {
   return (
     <div className="h-full flex items-center justify-center relative overflow-hidden px-4">
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-amber-500/[0.04] blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#f5c518]/[0.04] blur-[120px] pointer-events-none" />
       
       <div className="relative z-10 flex flex-col items-center text-center gap-6 w-full max-w-sm">
         {/* Logo */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/20">
-            <Film className="w-10 h-10 text-background" />
+          <div className="w-20 h-20 rounded-sm bg-[#f5c518] flex items-center justify-center shadow-xl shadow-[rgba(245,197,24,0.15)]">
+            <Film className="w-10 h-10 text-[#1b1012]" />
           </div>
-          <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-lg bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center shadow-md">
-            <Users className="w-4 h-4 text-background" />
+          <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-sm bg-[#f4dde0] flex items-center justify-center shadow-md">
+            <Users className="w-4 h-4 text-[#1b1012]" />
           </div>
         </div>
 

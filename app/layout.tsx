@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import { Playfair_Display, Literata } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -8,7 +8,7 @@ const playfair = Playfair_Display({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const sourceSans = Source_Sans_3({
+const literata = Literata({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${playfair.variable} ${sourceSans.variable} h-full antialiased`}
+      className={`${playfair.variable} ${literata.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col bg-background font-body">
         {/* Film grain overlay */}

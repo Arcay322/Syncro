@@ -66,17 +66,17 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
       <motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-4"
+        className="p-4 rounded-sm bg-[rgba(245,197,24,0.08)] border border-[rgba(245,197,24,0.15)] flex items-center gap-4"
       >
-        <Users className="w-5 h-5 text-amber-400 shrink-0" />
+        <Users className="w-5 h-5 text-[#f5c518] shrink-0" />
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-foreground">Sala creada: {createdGroup.name}</h3>
-          <p className="text-xs text-muted-foreground">Comparte el código</p>
+          <h3 className="text-sm font-medium text-[#f4dde0]">Sala creada: {createdGroup.name}</h3>
+          <p className="text-xs text-[#9b8e8f]">Comparte el código</p>
         </div>
-        <code className="px-3 py-1.5 bg-background/50 rounded-lg font-mono text-sm text-amber-400 border border-amber-500/20 tracking-wider">
+        <code className="px-3 py-1.5 bg-[#1b1012]/50 rounded-sm font-mono text-sm text-[#f5c518] border border-[rgba(245,197,24,0.15)] tracking-wider">
           {createdGroup.inviteCode}
         </code>
-        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-amber-400">
+        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-[#f5c518]">
           {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
         </Button>
       </motion.div>
@@ -90,20 +90,20 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
       className="p-4 rounded-xl bg-card/50 border border-border-soft"
     >
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-          <Users className="w-5 h-5 text-amber-400" />
+        <div className="w-10 h-10 rounded-sm bg-[rgba(245,197,24,0.08)] flex items-center justify-center shrink-0">
+          <Users className="w-5 h-5 text-[#f5c518]" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-foreground">Sala compartida</h3>
-          <p className="text-xs text-muted-foreground">Comparte tu watchlist con alguien</p>
+          <h3 className="text-sm font-medium text-[#f4dde0]">Sala compartida</h3>
+          <p className="text-xs text-[#9b8e8f]">Comparte tu watchlist con alguien</p>
         </div>
         
         {!showCreate && !showJoin ? (
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-background text-xs">
+            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
               <Plus className="w-3.5 h-3.5 mr-1" /> Crear
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-lg text-xs">
+            <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-sm text-xs border-[rgba(244,221,224,0.15)] text-[#f4dde0] hover:bg-[rgba(244,221,224,0.05)]">
               <LogIn className="w-3.5 h-3.5 mr-1" /> Unirse
             </Button>
           </div>
@@ -114,13 +114,13 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-              className="h-8 text-sm w-40"
+              className="h-8 text-sm w-40 bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-lg bg-amber-500 text-xs">
+            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
               Crear
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs">
+            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
               Cancelar
             </Button>
           </div>
@@ -132,13 +132,13 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && handleJoin()}
               maxLength={6}
-              className="h-8 text-sm w-28 text-center font-mono tracking-wider"
+              className="h-8 text-sm w-28 text-center font-mono tracking-wider bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-lg bg-amber-500 text-xs">
+            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#f5c518] text-[#1b1012] text-xs hover:bg-[#f5c518]/90">
               Unirse
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs">
+            <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
               Cancelar
             </Button>
           </div>
