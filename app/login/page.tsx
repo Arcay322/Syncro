@@ -1,8 +1,76 @@
-import { signIn } from "@/auth"
+"use client"
+
+import { useState } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Diamond, Mail, Lock, Ticket } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Diamond, Ticket } from "lucide-react"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const [isRegister, setIsRegister] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
+    if (isRegister) {
+      // Register
+      try {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, name }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setError(data.error || "Error al registrarse")
+          setLoading(false)
+          return
+        }
+        // Auto login after register
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        })
+        if (result?.ok) {
+          router.push("/")
+          router.refresh()
+        } else {
+          setError("Error al iniciar sesión")
+        }
+      } catch {
+        setError("Error de conexión")
+      }
+    } else {
+      // Login
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
+      if (result?.ok) {
+        router.push("/")
+        router.refresh()
+      } else {
+        setError("Email o contraseña incorrectos")
+      }
+    }
+    setLoading(false)
+  }
+
+  const handleGoogle = () => {
+    signIn("google", { callbackUrl: "/" })
+  }
+
   return (
     <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-4 bg-[#1b1012]">
       {/* Top Logo */}
@@ -19,61 +87,99 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-sm">
-        {/* Card border glow */}
         <div className="absolute -inset-[1px] bg-gradient-to-b from-[rgba(222,191,195,0.12)] to-transparent rounded-lg opacity-50" />
         
         <div className="relative bg-[#2c1a1d]/80 border border-[rgba(222,191,195,0.08)] rounded-lg p-8">
-          {/* Select Profile */}
+          {/* Title */}
           <h2 className="text-center text-sm font-display font-semibold text-[#f4dde0] mb-6 tracking-wide">
-            Select Profile
+            {isRegister ? "Crear Cuenta" : "Iniciar Sesión"}
           </h2>
 
-          {/* Profile avatars */}
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-14 h-14 rounded-full border-2 border-[rgba(222,191,195,0.4)] overflow-hidden bg-[#3f3133] flex items-center justify-center">
-                <span className="text-lg font-display text-[#f4dde0]">A</span>
-              </div>
-              <span className="text-[10px] text-[#9b8e8f] tracking-wider">Arnie</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-14 h-14 rounded-full border-2 border-[rgba(222,191,195,0.4)] overflow-hidden bg-[#3f3133] flex items-center justify-center">
-                <span className="text-lg font-display text-[#f4dde0]">E</span>
-              </div>
-              <span className="text-[10px] text-[#9b8e8f] tracking-wider">Ella</span>
-            </div>
-          </div>
+          {/* Error */}
+          {error && (
+            <p className="text-center text-xs text-[#ffb4ab] mb-4">{error}</p>
+          )}
 
-          {/* Private Access divider */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[rgba(245,197,24,0.2)]" />
-            <div className="flex items-center gap-1.5">
-              <Diamond className="w-2 h-2 text-[#debfc3]" />
-              <span className="text-[8px] tracking-[0.2em] uppercase text-[#debfc3]">Private Access</span>
-              <Diamond className="w-2 h-2 text-[#debfc3]" />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+            {isRegister && (
+              <div>
+                <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Nombre</label>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required={isRegister}
+                  className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                  placeholder="Tu nombre"
+                />
+              </div>
+            )}
+            
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Email</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                placeholder="correo@ejemplo.com"
+              />
             </div>
-            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[rgba(245,197,24,0.2)]" />
-          </div>
+            
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Contraseña</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                placeholder="••••••••"
+              />
+            </div>
 
-          {/* Google Auth Button styled as Enter the Theater */}
-          <form
-            action={async () => {
-              "use server"
-              await signIn("google", { redirectTo: "/" })
-            }}
-          >
             <Button 
               type="submit" 
-              className="w-full h-11 gap-2 text-xs font-semibold tracking-[0.1em] uppercase rounded-md bg-[#debfc3] text-[#1b1012] hover:bg-[#d4b5b9] transition-colors" 
+              disabled={loading}
+              className="w-full h-11 gap-2 text-xs font-semibold tracking-[0.1em] uppercase rounded-md bg-[#debfc3] text-[#1b1012] hover:bg-[#d4b5b9] transition-colors disabled:opacity-50" 
             >
               <Ticket className="w-4 h-4" />
-              Enter the Theater
+              {loading ? "Cargando..." : isRegister ? "Crear cuenta" : "Enter the Theater"}
             </Button>
           </form>
 
-          {/* Google hint */}
-          <p className="text-center text-[9px] text-[#9b8e8f] mt-3 tracking-wider">
-            Continue with Google
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[rgba(222,191,195,0.15)]" />
+            <span className="text-[8px] tracking-[0.2em] uppercase text-[#9b8e8f]">o</span>
+            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[rgba(222,191,195,0.15)]" />
+          </div>
+
+          {/* Google */}
+          <Button 
+            onClick={handleGoogle}
+            className="w-full h-10 gap-2 text-xs font-medium tracking-wider rounded-md bg-transparent border border-[rgba(222,191,195,0.2)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] transition-colors" 
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continuar con Google
+          </Button>
+
+          {/* Toggle */}
+          <p className="text-center text-[10px] text-[#9b8e8f] mt-5 tracking-wider">
+            {isRegister ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
+            <button
+              onClick={() => { setIsRegister(!isRegister); setError("") }}
+              className="text-[#debfc3] hover:text-[#f4dde0] transition-colors underline underline-offset-2"
+            >
+              {isRegister ? "Iniciar sesión" : "Registrarse"}
+            </button>
           </p>
         </div>
       </div>
