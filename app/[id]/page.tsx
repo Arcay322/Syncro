@@ -43,7 +43,7 @@ export default async function DetailPage({
   return (
     <>
       <Navbar user={user} />
-      <main className="flex-1 container max-w-4xl mx-auto px-4 py-8">
+      <main className="flex-1 w-full px-6 lg:px-12 xl:px-16 py-8">
         <DetailView item={item} tmdbDetails={tmdbDetails} />
       </main>
     </>

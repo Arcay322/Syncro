@@ -104,7 +104,7 @@ export function PendientesView({ pendingItems, moodMatches, groupName }: Pendien
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="max-w-3xl mx-auto"
+            className="max-w-5xl mx-auto"
           >
             <div className="p-6 rounded-xl bg-gradient-to-br from-[#291C1E] to-[#1B1012] border border-[#FFD65B]/20 space-y-4">
               <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export function PendientesView({ pendingItems, moodMatches, groupName }: Pendien
       </div>
 
       {/* Pending List */}
-      <div className="px-4 max-w-3xl mx-auto space-y-3">
+      <div className="px-4 max-w-5xl mx-auto space-y-3">
         {items.length > 0 ? (
           items.map((item, index) => (
             <motion.div

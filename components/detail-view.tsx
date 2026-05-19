@@ -190,7 +190,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   return (
     <div className="space-y-0">
       {/* Hero Header */}
-      <div className="relative -mx-4 -mt-8 min-h-[60vh] overflow-hidden">
+      <div className="relative -mx-6 lg:-mx-12 xl:-mx-16 -mt-8 min-h-[60vh] overflow-hidden">
         {/* Backdrop */}
         <Image
           src={getTmdbImageUrl(tmdbDetails.backdrop_path || tmdbDetails.poster_path, "original")}
@@ -203,7 +203,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1B1012] via-[#1B1012]/60 to-transparent" />
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 pt-24 pb-12">
+        <div className="relative z-10 w-full px-6 lg:px-12 xl:px-16 pt-24 pb-12">
           <Link href="/">
             <Button
               variant="ghost"
@@ -221,7 +221,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="shrink-0 w-full max-w-[280px] lg:w-[280px]"
+              className="shrink-0 w-full max-w-[320px] lg:w-[300px] xl:w-[340px]"
             >
               <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-2xl shadow-black/60 ring-1 ring-[#4F4445]/50">
                 <Image
@@ -285,7 +285,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
               {/* Sinopsis */}
               {tmdbDetails.overview && (
-                <p className="text-[#9B8E8F] leading-relaxed text-sm lg:text-base max-w-2xl font-serif">
+                <p className="text-[#9B8E8F] leading-relaxed text-sm lg:text-base max-w-4xl font-serif">
                   {tmdbDetails.overview}
                 </p>
               )}
@@ -340,7 +340,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
               {/* Progress Bar */}
               {isTv && totalEpisodes > 0 && (
-                <div className="space-y-2 max-w-md">
+                <div className="space-y-2 max-w-xl">
                   <div className="flex justify-between text-xs text-[#9B8E8F]">
                     <span>Progreso</span>
                     <span>{currentEp} / {totalEpisodes} episodios</span>
@@ -365,7 +365,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           animate={{ opacity: 1, height: "auto" }}
           className="px-4 py-6 bg-[#291C1E]/50 border-y border-[#4F4445]/30"
         >
-          <div className="max-w-2xl mx-auto space-y-3">
+          <div className="max-w-4xl mx-auto space-y-3">
             <label className="text-sm font-medium text-[#DEBFC3] font-serif">Notas del Cinéfilo</label>
             <textarea
               value={notes}
@@ -405,7 +405,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           <div className="flex justify-center">
             <StarRating value={Math.round(tmdbDetails.vote_average || 0)} size="lg" />
           </div>
-          <p className="text-xs text-[#4F4445] italic font-serif max-w-md mx-auto">
+          <p className="text-xs text-[#4F4445] italic font-serif max-w-2xl mx-auto">
             {tmdbDetails.vote_average >= 8
               ? "Una obra maestra del séptimo arte. Imperdible."
               : tmdbDetails.vote_average >= 6
@@ -419,7 +419,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="max-w-md mx-auto"
+          className="max-w-xl mx-auto"
         >
           <div className="p-5 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/40 space-y-3">
             <div className="flex items-center gap-3">
@@ -446,7 +446,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 }}
-            className="max-w-2xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
             <div className="p-5 rounded-xl bg-red-500/5 border border-red-500/20 space-y-3">
               <div className="flex items-center gap-2">
@@ -609,7 +609,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="max-w-md mx-auto p-6 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/40 space-y-4"
+            className="max-w-xl mx-auto p-6 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/40 space-y-4"
           >
             <h3 className="text-sm font-medium text-[#DEBFC3] font-serif">Progreso de Visionado</h3>
             <div className="flex items-center gap-3">

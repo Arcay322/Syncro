@@ -95,7 +95,7 @@ export function LibraryView({ initialItems }: LibraryViewProps) {
       </div>
 
       {/* Search */}
-      <div className="px-4 max-w-xl mx-auto">
+      <div className="px-4 max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -172,7 +172,7 @@ export function LibraryView({ initialItems }: LibraryViewProps) {
       {/* Grid */}
       <div className="px-4">
         {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-5">
             {filteredItems.map((item, index) => (
               <LibraryCard key={item.id} item={item} index={index} />
             ))}

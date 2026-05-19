@@ -197,7 +197,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
 
       {/* Stats Grid */}
       <div className="px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-5xl mx-auto">
           <StatCard
             icon={<Tv className="w-5 h-5 text-[#DEBFC3]" />}
             value={stats.totalSeries}
@@ -227,7 +227,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
 
       {/* Charts */}
       <div className="px-4">
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -254,7 +254,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
       </div>
 
       {/* Badges */}
-      <div className="px-4 max-w-3xl mx-auto space-y-6">
+      <div className="px-4 max-w-5xl mx-auto space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -267,7 +267,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
           {badges.map((badge, index) => (
             <motion.div
               key={badge.id}
@@ -314,7 +314,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
 
       {/* Top Rated */}
       {stats.topRated.length > 0 && (
-        <div className="px-4 max-w-3xl mx-auto space-y-6">
+        <div className="px-4 max-w-5xl mx-auto space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

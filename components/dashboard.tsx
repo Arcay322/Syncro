@@ -97,14 +97,14 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
   }, [items])
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div className="w-full px-6 lg:px-12 xl:px-16 py-10">
       {/* Header */}
       <div className="text-center mb-14">
         <p className="text-[10px] tracking-[0.3em] uppercase text-[#9b8e8f] mb-3 font-medium">Nosotros y Series</p>
         <h1 className="text-3xl md:text-4xl font-display font-semibold text-[#f4dde0] tracking-tight">
           Nuestro sofá, nuestras series
         </h1>
-        <div className="deco-divider mt-5 max-w-md mx-auto" />
+        <div className="deco-divider mt-5 max-w-xl mx-auto" />
       </div>
 
       {/* Main grid */}
@@ -129,7 +129,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
 
           {/* Watching cards */}
           {watchingItems.length > 0 ? (
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
               {watchingItems.map((item) => (
                 <WatchlistCard key={item.id} item={item} onUpdate={handleItemUpdate} onDelete={handleItemDelete} />
               ))}
@@ -154,10 +154,10 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           {/* All items grid */}
           <AnimatePresence mode="popLayout">
             {filteredItems.length > 0 && (
-              <motion.div
+                <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="grid grid-cols-2 md:grid-cols-3 gap-5"
+                className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5"
               >
                 {filteredItems.map((item, index) => (
                   <motion.div

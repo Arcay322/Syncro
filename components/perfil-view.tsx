@@ -89,7 +89,7 @@ export function PerfilView({ user, stats, groupName }: PerfilViewProps) {
       </div>
 
       {/* Profile Card */}
-      <div className="px-4 max-w-lg mx-auto">
+      <div className="px-4 max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -164,7 +164,7 @@ export function PerfilView({ user, stats, groupName }: PerfilViewProps) {
       </div>
 
       {/* Actions */}
-      <div className="px-4 max-w-lg mx-auto space-y-3">
+      <div className="px-4 max-w-2xl mx-auto space-y-3">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -48,7 +48,7 @@ export function Navbar({ user }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#4f4445] bg-[#1b1012]/95 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
+      <div className="w-full px-6 lg:px-12 xl:px-16 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5">
           <Diamond className="w-3 h-3 text-[#debfc3]" />
