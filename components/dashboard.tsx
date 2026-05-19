@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { WatchlistCard } from "./watchlist-card"
 import { SearchCommand } from "./search-command"
 import { StatusFilter } from "./status-filter"
 import { Button } from "@/components/ui/button"
-import { Plus, Film, Clapperboard } from "lucide-react"
+import { Plus, Film, Clapperboard, Clock, CheckCircle, Tv, TrendingUp } from "lucide-react"
 import { GroupManager } from "./group-manager"
 import type { WatchlistItemWithTmdb } from "@/types"
 
@@ -34,6 +34,20 @@ interface DashboardProps {
   userId: string
 }
 
+function formatTimeAgo(date: Date): string {
+  const now = new Date()
+  const diff = now.getTime() - new Date(date).getTime()
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+  
+  if (minutes < 1) return "Justo ahora"
+  if (minutes < 60) return `Hace ${minutes} min`
+  if (hours < 24) return `Hace ${hours} h`
+  if (days < 7) return `Hace ${days} d`
+  return new Date(date).toLocaleDateString("es", { day: "numeric", month: "short" })
+}
+
 export function Dashboard({ initialItems, group, userId }: DashboardProps) {
   const [items, setItems] = useState(initialItems)
   const [filter, setFilter] = useState<string>("ALL")
@@ -53,6 +67,34 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
 
   const filteredItems = filter === "ALL" ? items : items.filter((item) => item.status === filter)
   const watchingItems = items.filter((i) => i.status === "WATCHING")
+
+  // Stats
+  const stats = useMemo(() => {
+    const totalSeries = items.filter((i) => i.mediaType === "tv").length
+    const totalMovies = items.filter((i) => i.mediaType === "movie").length
+    const completed = items.filter((i) => i.status === "COMPLETED").length
+    const totalEpisodes = items.reduce((acc, item) => acc + (item.currentEpisode || 0), 0)
+    const estimatedHours = Math.round(totalEpisodes * 0.75 + totalMovies * 1.5)
+    
+    return { totalSeries, totalMovies, completed, totalEpisodes, estimatedHours }
+  }, [items])
+
+  // Activity feed
+  const activityFeed = useMemo(() => {
+    return items
+      .filter((item) => item.currentEpisode && item.currentEpisode > 0)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 5)
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        type: item.mediaType,
+        action: item.currentEpisode
+          ? `Marcó episodio ${item.currentEpisode}`
+          : "Agregó a la lista",
+        timestamp: item.updatedAt,
+      }))
+  }, [items])
 
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
@@ -134,24 +176,32 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           {/* Recent Activity */}
           <div className="pt-6">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-1 rounded-full bg-[#9b8e8f]" />
+              <TrendingUp className="w-3.5 h-3.5 text-[#9b8e8f]" />
               <span className="text-[10px] tracking-[0.2em] uppercase text-[#9b8e8f] font-medium">Actividad reciente</span>
             </div>
-            <div className="space-y-3">
-              {items.slice(0, 3).map((item) => (
-                <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[#4f4445]/30">
-                  <div className="w-8 h-8 rounded-full bg-[#3f3133] flex items-center justify-center shrink-0">
-                    <Film className="w-3.5 h-3.5 text-[#9b8e8f]" />
+            <div className="space-y-2">
+              {activityFeed.length > 0 ? (
+                activityFeed.map((activity) => (
+                  <div key={activity.id} className="flex items-center gap-3 py-2.5 border-b border-[#4f4445]/30">
+                    <div className="w-8 h-8 rounded-full bg-[#342729] flex items-center justify-center shrink-0">
+                      {activity.type === "tv" ? (
+                        <Tv className="w-3.5 h-3.5 text-[#ffd65b]" />
+                      ) : (
+                        <Film className="w-3.5 h-3.5 text-[#debfc3]" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#f4dde0] truncate">{activity.title}</p>
+                      <p className="text-[10px] text-[#9b8e8f]">
+                        {activity.action}
+                      </p>
+                    </div>
+                    <span className="text-[9px] text-[#9b8e8f] tracking-wider shrink-0">
+                      {formatTimeAgo(activity.timestamp)}
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#f4dde0] truncate">{item.title}</p>
-                    <p className="text-[10px] text-[#9b8e8f]">
-                      {item.mediaType === "tv" ? "Serie" : "Película"} · Actualizado recientemente
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {items.length === 0 && (
+                ))
+              ) : (
                 <p className="text-xs text-[#9b8e8f] py-4 text-center">No hay actividad reciente</p>
               )}
             </div>
@@ -165,7 +215,6 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             <div className="text-center relative z-10">
               <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-5">La ruleta del destino</p>
               
-              {/* Dashed circle with clapperboard */}
               <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[#4f4445] flex items-center justify-center">
                 <Clapperboard className="w-7 h-7 text-[#9b8e8f]" />
               </div>
@@ -181,11 +230,34 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
 
           {/* Stats */}
           <div className="p-6 border border-[#4f4445] rounded-lg bg-[#291c1e]">
-            <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-6 text-center">Estadísticas juntos</p>
+            <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-5 text-center">Estadísticas juntos</p>
+            
+            {/* Big number */}
             <div className="text-center mb-5">
-              <p className="text-4xl font-display font-bold text-[#ffd65b]">{items.length}</p>
-              <p className="text-[10px] text-[#9b8e8f] tracking-[0.15em] uppercase mt-1">horas juntos</p>
+              <p className="text-4xl font-display font-bold text-[#ffd65b]">{stats.estimatedHours}</p>
+              <p className="text-[10px] text-[#9b8e8f] tracking-[0.15em] uppercase mt-1">horas juntas</p>
             </div>
+
+            {/* Mini stats grid */}
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="text-center p-2 bg-[#1b1012] rounded-md">
+                <p className="text-lg font-display font-bold text-[#f4dde0]">{stats.totalSeries}</p>
+                <p className="text-[9px] text-[#9b8e8f] tracking-wider uppercase">Series</p>
+              </div>
+              <div className="text-center p-2 bg-[#1b1012] rounded-md">
+                <p className="text-lg font-display font-bold text-[#f4dde0]">{stats.totalMovies}</p>
+                <p className="text-[9px] text-[#9b8e8f] tracking-wider uppercase">Películas</p>
+              </div>
+              <div className="text-center p-2 bg-[#1b1012] rounded-md">
+                <p className="text-lg font-display font-bold text-[#debfc3]">{stats.completed}</p>
+                <p className="text-[9px] text-[#9b8e8f] tracking-wider uppercase">Terminadas</p>
+              </div>
+              <div className="text-center p-2 bg-[#1b1012] rounded-md">
+                <p className="text-lg font-display font-bold text-[#debfc3]">{stats.totalEpisodes}</p>
+                <p className="text-[9px] text-[#9b8e8f] tracking-wider uppercase">Episodios</p>
+              </div>
+            </div>
+
             {/* Bar chart */}
             <div className="flex items-end justify-center gap-2 h-16">
               <div className="w-7 bg-[#4f4445] rounded-t-sm" style={{ height: '30%' }} />
