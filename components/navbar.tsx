@@ -41,9 +41,9 @@ export function Navbar({ user }: NavbarProps) {
 
   const navLinks = [
     { href: "/", label: "Dashboard" },
-    { href: "#", label: "Series" },
-    { href: "#", label: "Películas" },
-    { href: "#", label: "Estadísticas" },
+    { href: "/series", label: "Biblioteca" },
+    { href: "/pendientes", label: "Pendientes" },
+    { href: "/estadisticas", label: "Estadísticas" },
   ]
 
   return (
