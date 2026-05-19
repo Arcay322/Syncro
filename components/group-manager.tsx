@@ -68,15 +68,15 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
         animate={{ opacity: 1, y: 0 }}
         className="p-4 rounded-sm bg-[rgba(245,197,24,0.08)] border border-[rgba(245,197,24,0.15)] flex items-center gap-4"
       >
-        <Users className="w-5 h-5 text-[#f5c518] shrink-0" />
+        <Users className="w-5 h-5 text-[#ffd65b] shrink-0" />
         <div className="flex-1">
           <h3 className="text-sm font-medium text-[#f4dde0]">Sala creada: {createdGroup.name}</h3>
           <p className="text-xs text-[#9b8e8f]">Comparte el código</p>
         </div>
-        <code className="px-3 py-1.5 bg-[#1b1012]/50 rounded-sm font-mono text-sm text-[#f5c518] border border-[rgba(245,197,24,0.15)] tracking-wider">
+        <code className="px-3 py-1.5 bg-[#1b1012]/50 rounded-sm font-mono text-sm text-[#ffd65b] border border-[rgba(245,197,24,0.15)] tracking-wider">
           {createdGroup.inviteCode}
         </code>
-        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-[#f5c518]">
+        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-[#ffd65b]">
           {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
         </Button>
       </motion.div>
@@ -91,7 +91,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
     >
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-sm bg-[rgba(245,197,24,0.08)] flex items-center justify-center shrink-0">
-          <Users className="w-5 h-5 text-[#f5c518]" />
+          <Users className="w-5 h-5 text-[#ffd65b]" />
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-medium text-[#f4dde0]">Sala compartida</h3>
@@ -100,7 +100,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
         
         {!showCreate && !showJoin ? (
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
+            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
               <Plus className="w-3.5 h-3.5 mr-1" /> Crear
             </Button>
             <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-sm text-xs border-[rgba(244,221,224,0.15)] text-[#f4dde0] hover:bg-[rgba(244,221,224,0.05)]">
@@ -117,7 +117,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               className="h-8 text-sm w-40 bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
+            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
               Crear
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
@@ -135,7 +135,7 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
               className="h-8 text-sm w-28 text-center font-mono tracking-wider bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#1b1012] text-xs hover:bg-[#d4b5b9]">
+            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
               Unirse
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">

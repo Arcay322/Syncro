@@ -47,12 +47,12 @@ export function Navbar({ user }: NavbarProps) {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(245,197,24,0.06)] bg-[#1b1012]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[#4f4445] bg-[#1b1012]/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5">
-          <Diamond className="w-3 h-3 text-[#f5c518]" />
-          <span className="font-display text-xs font-semibold tracking-[0.25em] text-[#f5c518] uppercase">Syncro</span>
+          <Diamond className="w-3 h-3 text-[#debfc3]" />
+          <span className="font-display text-xs font-semibold tracking-[0.25em] text-[#debfc3] uppercase">Syncro</span>
         </Link>
 
         {/* Center nav links */}
@@ -65,7 +65,7 @@ export function Navbar({ user }: NavbarProps) {
                 href={link.href}
                 className={`text-[10px] font-medium tracking-[0.15em] uppercase transition-colors ${
                   isActive
-                    ? "text-[#f5c518]"
+                    ? "text-[#debfc3]"
                     : "text-[#9b8e8f] hover:text-[#f4dde0]"
                 }`}
               >
@@ -79,7 +79,7 @@ export function Navbar({ user }: NavbarProps) {
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="relative h-7 w-7 rounded-full cursor-pointer ring-1 ring-[rgba(245,197,24,0.25)] hover:ring-[rgba(245,197,24,0.5)] transition-all overflow-hidden">
+              <div className="relative h-7 w-7 rounded-full cursor-pointer ring-1 ring-[#4f4445] hover:ring-[#9b8e8f] transition-all overflow-hidden">
                 {user.image ? (
                   <img src={user.image} alt={user.name || "User"} className="h-7 w-7 rounded-full object-cover" />
                 ) : (
@@ -92,7 +92,7 @@ export function Navbar({ user }: NavbarProps) {
                 )}
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-[#2c1a1d] border border-[rgba(245,197,24,0.1)] rounded-md">
+            <DropdownMenuContent align="end" className="w-48 bg-[#291c1e] border border-[#4f4445] rounded-md">
               <div className="px-3 py-2">
                 <p className="text-sm font-medium text-[#f4dde0] font-display">{user.name}</p>
                 <p className="text-[10px] text-[#9b8e8f] mt-0.5">{user.email}</p>

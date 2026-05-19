@@ -54,13 +54,13 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           {/* Section header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Film className="w-4 h-4 text-[#debfc3]" />
-              <span className="text-[10px] tracking-[0.2em] uppercase text-[#debfc3] font-medium">Viendo ahora</span>
+              <Film className="w-4 h-4 text-[#9b8e8f]" />
+              <span className="text-[10px] tracking-[0.2em] uppercase text-[#9b8e8f] font-medium">Viendo ahora</span>
             </div>
             <Button
               onClick={() => setSearchOpen(true)}
               size="sm"
-              className="h-8 gap-1.5 rounded-md bg-transparent border border-[rgba(222,191,195,0.25)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] text-[10px] tracking-wider uppercase px-3"
+              className="h-8 gap-1.5 rounded-md bg-transparent border border-[#4f4445] text-[#9b8e8f] hover:bg-[rgba(159,142,143,0.06)] hover:text-[#f4dde0] text-[10px] tracking-wider uppercase px-3"
             >
               <Plus className="w-3.5 h-3.5" />
               Agregar
@@ -75,13 +75,13 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 border border-dashed border-[rgba(245,197,24,0.1)] rounded-md">
-              <Film className="w-8 h-8 text-[#debfc3]/20 mx-auto mb-3" />
+            <div className="text-center py-16 border border-dashed border-[#4f4445] rounded-md">
+              <Film className="w-8 h-8 text-[#9b8e8f]/30 mx-auto mb-3" />
               <p className="text-sm text-[#9b8e8f]">No estás viendo nada ahora mismo</p>
               <Button
                 variant="ghost"
                 onClick={() => setSearchOpen(true)}
-                className="mt-3 text-xs text-[#debfc3] hover:text-[#debfc3] hover:bg-[rgba(222,191,195,0.04)]"
+                className="mt-3 text-xs text-[#9b8e8f] hover:text-[#f4dde0] hover:bg-[rgba(159,142,143,0.04)]"
               >
                 Buscar serie o película
               </Button>
@@ -121,9 +121,9 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             </div>
             <div className="space-y-3">
               {items.slice(0, 3).map((item) => (
-                <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[rgba(245,197,24,0.05)]">
+                <div key={item.id} className="flex items-center gap-3 py-2 border-b border-[#4f4445]/30">
                   <div className="w-8 h-8 rounded-full bg-[#3f3133] flex items-center justify-center shrink-0">
-                    <Film className="w-3.5 h-3.5 text-[#debfc3]" />
+                    <Film className="w-3.5 h-3.5 text-[#9b8e8f]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#f4dde0] truncate">{item.title}</p>
@@ -143,17 +143,17 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
         {/* Right sidebar - 1 col */}
         <div className="space-y-6">
           {/* Roulette */}
-          <div className="p-6 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40 relative overflow-hidden">
+          <div className="p-6 border border-[#4f4445] rounded-lg bg-[#291c1e] relative overflow-hidden">
             <div className="text-center relative z-10">
               <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-5">La ruleta del destino</p>
               
               {/* Dashed circle with clapperboard */}
-              <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[rgba(245,197,24,0.2)] flex items-center justify-center">
-                <Clapperboard className="w-7 h-7 text-[#debfc3]/50" />
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full border-2 border-dashed border-[#4f4445] flex items-center justify-center">
+                <Clapperboard className="w-7 h-7 text-[#9b8e8f]" />
               </div>
               
               <Button
-                className="w-full h-10 bg-transparent border border-[rgba(222,191,195,0.25)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
+                className="w-full h-10 bg-transparent border border-[#4f4445] text-[#9b8e8f] hover:bg-[rgba(159,142,143,0.06)] hover:text-[#f4dde0] rounded-md text-[10px] font-medium tracking-[0.08em] uppercase"
               >
                 <span className="mr-1.5 text-xs">⊞</span>
                 Girar la bobina
@@ -162,27 +162,27 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           </div>
 
           {/* Stats */}
-          <div className="p-6 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40">
+          <div className="p-6 border border-[#4f4445] rounded-lg bg-[#291c1e]">
             <p className="text-[10px] tracking-[0.25em] uppercase text-[#9b8e8f] font-medium mb-6 text-center">Estadísticas juntos</p>
             <div className="text-center mb-5">
-              <p className="text-4xl font-display font-bold text-[#f5c518]">{items.length}</p>
+              <p className="text-4xl font-display font-bold text-[#ffd65b]">{items.length}</p>
               <p className="text-[10px] text-[#9b8e8f] tracking-[0.15em] uppercase mt-1">horas juntos</p>
             </div>
             {/* Bar chart */}
             <div className="flex items-end justify-center gap-2 h-16">
-              <div className="w-7 bg-[#3f3133] rounded-t-sm" style={{ height: '30%' }} />
-              <div className="w-7 bg-[#3f3133] rounded-t-sm" style={{ height: '50%' }} />
-              <div className="w-7 bg-[#f5c518] rounded-t-sm" style={{ height: '80%' }} />
-              <div className="w-7 bg-[#3f3133] rounded-t-sm" style={{ height: '40%' }} />
-              <div className="w-7 bg-[#3f3133] rounded-t-sm" style={{ height: '25%' }} />
+              <div className="w-7 bg-[#4f4445] rounded-t-sm" style={{ height: '30%' }} />
+              <div className="w-7 bg-[#4f4445] rounded-t-sm" style={{ height: '50%' }} />
+              <div className="w-7 bg-[#ffd65b] rounded-t-sm" style={{ height: '80%' }} />
+              <div className="w-7 bg-[#4f4445] rounded-t-sm" style={{ height: '40%' }} />
+              <div className="w-7 bg-[#4f4445] rounded-t-sm" style={{ height: '25%' }} />
             </div>
           </div>
 
           {/* Shared status */}
           {group && (
-            <div className="p-4 border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d]/40">
+            <div className="p-4 border border-[#4f4445] rounded-lg bg-[#291c1e]">
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-[#debfc3]" />
+                <div className="w-2 h-2 rounded-full bg-[#ffd65b]" />
                 <span className="text-xs text-[#f4dde0]">Sala compartida activa</span>
               </div>
               <p className="text-[10px] text-[#9b8e8f]">{group.name}</p>
@@ -192,7 +192,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
       </div>
 
       {/* Footer */}
-      <footer className="mt-20 pt-8 border-t border-[rgba(245,197,24,0.06)]">
+      <footer className="mt-20 pt-8 border-t border-[#4f4445]">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-display text-sm font-semibold tracking-[0.15em] text-[#f4dde0] uppercase">Syncro</span>

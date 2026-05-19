@@ -72,7 +72,7 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
 
   return (
     <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300 }}>
-      <div className="border border-[rgba(245,197,24,0.1)] rounded-md bg-[#2c1a1d] overflow-hidden group card-glow">
+      <div className="border border-[#4f4445] rounded-lg bg-[#291c1e] overflow-hidden group card-glow">
         {/* Poster image */}
         <Link href={`/${item.id}`} className="block relative aspect-[2/3] overflow-hidden">
           <img
@@ -80,12 +80,12 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
             alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2c1a1d]/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#291c1e]/60 via-transparent to-transparent" />
           
           {/* Shared badge - top right */}
           {item.groupId && (
             <div className="absolute top-3 right-3 z-10">
-              <span className="inline-flex items-center gap-1 text-[9px] px-2.5 py-1 bg-[#debfc3] text-[#1b1012] font-semibold tracking-wider rounded-full">
+              <span className="inline-flex items-center gap-1 text-[9px] px-2.5 py-1 bg-[#debfc3] text-[#3f2b2e] font-semibold tracking-wider rounded-full">
                 <Heart className="w-2.5 h-2.5" fill="currentColor" /> Compartido
               </span>
             </div>
@@ -98,9 +98,9 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
                 <MoreHorizontal className="h-3 w-3 text-white" />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="bg-[#2c1a1d] border border-[rgba(245,197,24,0.1)] min-w-[130px] rounded-md">
+            <DropdownMenuContent align="start" className="bg-[#291c1e] border border-[#4f4445] min-w-[130px] rounded-md">
               <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("WATCHING") }} disabled={isLoading} className="text-xs text-[#f4dde0]">
-                <Play className="mr-1.5 h-3 w-3 text-[#f5c518]" /> Viendo
+                <Play className="mr-1.5 h-3 w-3 text-[#ffd65b]" /> Viendo
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.preventDefault(); updateStatus("COMPLETED") }} disabled={isLoading} className="text-xs text-[#f4dde0]">
                 <Check className="mr-1.5 h-3 w-3 text-emerald-400" /> Terminada
@@ -122,20 +122,20 @@ export function WatchlistCard({ item, onUpdate, onDelete }: WatchlistCardProps) 
             <p className="text-[10px] text-[#9b8e8f] font-mono tracking-wider mb-3">{progressText}</p>
           )}
           
-          {/* Progress bar */}
+          {/* Progress bar - gold secondary */}
           <div className="h-[2px] bg-[#3f3133] rounded-full mb-3 overflow-hidden">
             <div 
-              className="h-full bg-[#f5c518] rounded-full transition-all duration-500" 
+              className="h-full bg-[#ffd65b] rounded-full transition-all duration-500" 
               style={{ width: `${progressWidth}%` }} 
             />
           </div>
           
-          {/* Next episode button */}
+          {/* Next episode button - primary beige */}
           {item.mediaType === "tv" && (
             <Button
               onClick={handleNextEpisode}
               disabled={isLoading}
-              className="w-full h-9 bg-[#debfc3] text-[#1b1012] hover:bg-[#d4b5b9] rounded-md text-[10px] font-semibold tracking-[0.06em] uppercase"
+              className="w-full h-9 bg-[#debfc3] text-[#3f2b2e] hover:bg-[#d4b5b9] rounded-md text-[10px] font-semibold tracking-[0.06em] uppercase"
             >
               <Play className="w-3 h-3 mr-1.5 fill-current" />
               Marcar siguiente capítulo

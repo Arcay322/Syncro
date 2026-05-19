@@ -32,64 +32,64 @@
   --radius-xl: calc(var(--radius) * 1.5);
 }
 
-/* ===== SYNCRO ART DECO CINEMA THEME ===== */
+/* ===== SYNCRO ART DECO CINEMA THEME - STITCH EXACT TOKENS ===== */
 :root {
   --radius: 0.5rem;
   
-  /* Base palette from Stitch mockup */
+  /* Background - Deep velvet */
   --background: #1b1012;
   --foreground: #f4dde0;
   
-  /* Surfaces - borgoña */
-  --card: #2c1a1d;
+  /* Surfaces - Stitch tokens */
+  --card: #291c1e;
   --card-foreground: #f4dde0;
-  --popover: #2c1a1d;
+  --popover: #291c1e;
   --popover-foreground: #f4dde0;
   
-  /* Primary: gold */
-  --primary: #f5c518;
-  --primary-foreground: #1b1012;
+  /* Primary: Velvet Beige - buttons, badges, active states */
+  --primary: #debfc3;
+  --primary-foreground: #3f2b2e;
   
-  /* Secondary: mauve/beige */
-  --secondary: #debfc3;
-  --secondary-foreground: #1b1012;
+  /* Secondary: Polished Gold - accents, icons, progress */
+  --secondary: #ffd65b;
+  --secondary-foreground: #3d2f00;
   
-  /* Muted: taupe */
+  /* Muted: Muted taupe */
   --muted: #3f3133;
   --muted-foreground: #9b8e8f;
   
-  /* Accent: dusty rose */
-  --accent: #574144;
+  /* Accent: Surface container high */
+  --accent: #342729;
   --accent-foreground: #f4dde0;
   
-  /* Destructive: warm red */
+  /* Destructive: Warm red */
   --destructive: #ffb4ab;
   
-  /* Borders: subtle gold lines */
-  --border: rgba(245, 197, 24, 0.1);
-  --input: rgba(244, 221, 224, 0.06);
-  --ring: #f5c518;
+  /* Borders: Outline tokens */
+  --border: rgba(159, 142, 143, 0.12);
+  --input: rgba(159, 142, 143, 0.08);
+  --ring: #debfc3;
 }
 
 .dark {
   --background: #1b1012;
   --foreground: #f4dde0;
-  --card: #2c1a1d;
+  --card: #291c1e;
   --card-foreground: #f4dde0;
-  --popover: #2c1a1d;
+  --popover: #291c1e;
   --popover-foreground: #f4dde0;
-  --primary: #f5c518;
-  --primary-foreground: #1b1012;
-  --secondary: #debfc3;
-  --secondary-foreground: #1b1012;
+  --primary: #debfc3;
+  --primary-foreground: #3f2b2e;
+  --secondary: #ffd65b;
+  --secondary-foreground: #3d2f00;
   --muted: #3f3133;
   --muted-foreground: #9b8e8f;
-  --accent: #574144;
+  --accent: #342729;
   --accent-foreground: #f4dde0;
   --destructive: #ffb4ab;
-  --border: rgba(245, 197, 24, 0.1);
-  --input: rgba(244, 221, 224, 0.06);
-  --ring: #f5c518;
+  --border: rgba(159, 142, 143, 0.12);
+  --input: rgba(159, 142, 143, 0.08);
+  --ring: #debfc3;
 }
 
 @layer base {
@@ -105,7 +105,7 @@
   }
 }
 
-/* Custom scrollbar - warm gold thin */
+/* Custom scrollbar - outline thin */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -113,11 +113,11 @@
   background: #1b1012;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 197, 24, 0.15);
+  background: rgba(159, 142, 143, 0.15);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 197, 24, 0.3);
+  background: rgba(159, 142, 143, 0.3);
 }
 
 /* Art Deco divider */
@@ -132,19 +132,14 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.35), transparent);
-}
-
-/* Thin gold line separator */
-.gold-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 197, 24, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(159, 142, 143, 0.3), transparent);
 }
 
 /* Card glow on hover */
 .card-glow {
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .card-glow:hover {
-  box-shadow: 0 0 30px rgba(245, 197, 24, 0.08);
+  box-shadow: 0 0 30px rgba(222, 191, 195, 0.06);
+  border-color: rgba(159, 142, 143, 0.2);
 }

@@ -27,14 +27,14 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
           className={cn(
             "relative px-4 py-2 text-xs font-medium rounded-full transition-all duration-300",
             value === filter.value
-              ? "text-[#1b1012]"
+              ? "text-[#3f2b2e]"
               : "text-[#9b8e8f] hover:text-[#f4dde0]"
           )}
         >
           {value === filter.value && (
             <motion.div
               layoutId="activeFilter"
-              className="absolute inset-0 bg-[#f5c518] rounded-full"
+              className="absolute inset-0 bg-[#debfc3] rounded-full"
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
           )}
