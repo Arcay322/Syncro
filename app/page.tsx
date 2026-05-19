@@ -17,7 +17,19 @@ export default async function Home() {
 
   const groupMember = await prisma.groupMember.findFirst({
     where: { userId: session.user.id },
-    include: { group: true },
+    include: {
+      group: {
+        include: {
+          members: {
+            include: {
+              user: {
+                select: { id: true, name: true, image: true },
+              },
+            },
+          },
+        },
+      },
+    },
   })
 
   const personalItems = await prisma.watchlistItem.findMany({

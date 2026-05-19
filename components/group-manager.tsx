@@ -1,27 +1,61 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Users, Plus, LogIn, Copy, Check } from "lucide-react"
+import { Users, Plus, LogIn, Copy, Check, LogOut, Crown } from "lucide-react"
 import type { Group } from "@prisma/client"
 
-interface GroupManagerProps {
-  onGroupChange: (group: Group | null) => void
+interface GroupMember {
+  id: string
+  role: string
+  user: {
+    id: string
+    name: string | null
+    image: string | null
+  }
 }
 
-export function GroupManager({ onGroupChange }: GroupManagerProps) {
+interface GroupWithMembers extends Group {
+  members: GroupMember[]
+}
+
+interface GroupManagerProps {
+  group: GroupWithMembers | null
+  onGroupChange: (group: GroupWithMembers | null) => void
+}
+
+function getInitials(name: string | null): string {
+  if (!name) return "?"
+  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+}
+
+function getAvatarColor(name: string | null): string {
+  if (!name) return "#3f3133"
+  const colors = ["#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#3B82F6", "#EF4444", "#06B6D4"]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return colors[Math.abs(hash) % colors.length]
+}
+
+export function GroupManager({ group, onGroupChange }: GroupManagerProps) {
   const [showCreate, setShowCreate] = useState(false)
   const [showJoin, setShowJoin] = useState(false)
   const [groupName, setGroupName] = useState("")
   const [inviteCode, setInviteCode] = useState("")
   const [loading, setLoading] = useState(false)
-  const [createdGroup, setCreatedGroup] = useState<Group | null>(null)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState("")
 
   const handleCreate = async () => {
-    if (!groupName.trim()) return
+    if (!groupName.trim() || groupName.trim().length < 2) {
+      setError("El nombre debe tener al menos 2 caracteres")
+      return
+    }
+    setError("")
     setLoading(true)
     const res = await fetch("/api/groups", {
       method: "POST",
@@ -30,14 +64,22 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
     })
     if (res.ok) {
       const data = await res.json()
-      setCreatedGroup(data.group)
       onGroupChange(data.group)
+      setShowCreate(false)
+      setGroupName("")
+    } else {
+      const data = await res.json()
+      setError(data.error || "Error al crear la sala")
     }
     setLoading(false)
   }
 
   const handleJoin = async () => {
-    if (!inviteCode.trim()) return
+    if (!inviteCode.trim() || inviteCode.trim().length !== 6) {
+      setError("El código debe tener 6 caracteres")
+      return
+    }
+    setError("")
     setLoading(true)
     const res = await fetch("/api/groups/join", {
       method: "POST",
@@ -47,103 +89,198 @@ export function GroupManager({ onGroupChange }: GroupManagerProps) {
     if (res.ok) {
       const data = await res.json()
       onGroupChange(data.group)
+      setShowJoin(false)
+      setInviteCode("")
     } else {
-      alert("Código inválido")
+      const data = await res.json()
+      setError(data.error || "Código inválido")
+    }
+    setLoading(false)
+  }
+
+  const handleLeave = async () => {
+    if (!confirm("¿Salir de la sala?")) return
+    setLoading(true)
+    const res = await fetch("/api/groups/leave", {
+      method: "DELETE",
+    })
+    if (res.ok) {
+      onGroupChange(null)
     }
     setLoading(false)
   }
 
   const copyCode = () => {
-    if (createdGroup) {
-      navigator.clipboard.writeText(createdGroup.inviteCode)
+    if (group) {
+      navigator.clipboard.writeText(group.inviteCode)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
   }
 
-  if (createdGroup) {
+  // Show group info if user is in a group
+  if (group) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-4 rounded-sm bg-[rgba(245,197,24,0.08)] border border-[rgba(245,197,24,0.15)] flex items-center gap-4"
+        className="p-4 border border-[#4f4445] rounded-lg bg-[#291c1e]"
       >
-        <Users className="w-5 h-5 text-[#ffd65b] shrink-0" />
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-[#f4dde0]">Sala creada: {createdGroup.name}</h3>
-          <p className="text-xs text-[#9b8e8f]">Comparte el código</p>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#ffd65b]" />
+            <span className="text-xs font-medium text-[#f4dde0]">Sala compartida activa</span>
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleLeave}
+            disabled={loading}
+            className="h-6 text-[10px] text-[#ffb4ab] hover:text-[#ffb4ab] hover:bg-[rgba(255,180,171,0.08)] px-2"
+          >
+            <LogOut className="w-3 h-3 mr-1" />
+            Salir
+          </Button>
         </div>
-        <code className="px-3 py-1.5 bg-[#1b1012]/50 rounded-sm font-mono text-sm text-[#ffd65b] border border-[rgba(245,197,24,0.15)] tracking-wider">
-          {createdGroup.inviteCode}
-        </code>
-        <Button size="icon" variant="ghost" onClick={copyCode} className="h-8 w-8 shrink-0 text-[#ffd65b]">
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-        </Button>
+
+        {/* Group name */}
+        <h3 className="text-sm font-display font-semibold text-[#f4dde0] mb-3">{group.name}</h3>
+
+        {/* Invite code */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-[10px] text-[#9b8e8f] tracking-wider uppercase">Código:</span>
+          <code className="px-2 py-1 bg-[#1b1012] rounded-sm font-mono text-xs text-[#ffd65b] border border-[#4f4445] tracking-wider">
+            {group.inviteCode}
+          </code>
+          <Button size="icon" variant="ghost" onClick={copyCode} className="h-6 w-6 text-[#9b8e8f] hover:text-[#ffd65b]">
+            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          </Button>
+        </div>
+
+        {/* Members */}
+        <div className="space-y-2">
+          <p className="text-[10px] text-[#9b8e8f] tracking-wider uppercase mb-2">Miembros</p>
+          {group.members?.map((member) => {
+            const initials = getInitials(member.user.name)
+            const avatarBg = getAvatarColor(member.user.name)
+            const isOwner = member.role === "owner"
+            return (
+              <div key={member.id} className="flex items-center gap-2 py-1">
+                <div className="relative">
+                  {member.user.image ? (
+                    <img src={member.user.image} alt={member.user.name || ""} className="w-6 h-6 rounded-full object-cover" />
+                  ) : (
+                    <div 
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                      style={{ backgroundColor: avatarBg }}
+                    >
+                      {initials}
+                    </div>
+                  )}
+                  {isOwner && (
+                    <Crown className="w-2.5 h-2.5 text-[#ffd65b] absolute -top-0.5 -right-0.5" />
+                  )}
+                </div>
+                <span className="text-xs text-[#f4dde0]">{member.user.name}</span>
+              </div>
+            )
+          })}
+        </div>
       </motion.div>
     )
   }
 
+  // Show create/join UI if not in a group
   return (
     <motion.div
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 rounded-xl bg-card/50 border border-border-soft"
+      className="p-4 border border-[#4f4445] rounded-lg bg-[#291c1e]"
     >
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-sm bg-[rgba(245,197,24,0.08)] flex items-center justify-center shrink-0">
-          <Users className="w-5 h-5 text-[#ffd65b]" />
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-8 h-8 rounded-sm bg-[#342729] flex items-center justify-center shrink-0">
+          <Users className="w-4 h-4 text-[#9b8e8f]" />
         </div>
-        <div className="flex-1">
+        <div>
           <h3 className="text-sm font-medium text-[#f4dde0]">Sala compartida</h3>
-          <p className="text-xs text-[#9b8e8f]">Comparte tu watchlist con alguien</p>
+          <p className="text-[10px] text-[#9b8e8f]">Comparte tu watchlist</p>
         </div>
-        
+      </div>
+
+      {error && (
+        <p className="text-[10px] text-[#ffb4ab] mb-2">{error}</p>
+      )}
+
+      <AnimatePresence mode="wait">
         {!showCreate && !showJoin ? (
-          <div className="flex gap-2">
-            <Button size="sm" onClick={() => setShowCreate(true)} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
-              <Plus className="w-3.5 h-3.5 mr-1" /> Crear
+          <motion.div
+            key="buttons"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex gap-2"
+          >
+            <Button size="sm" onClick={() => { setShowCreate(true); setError("") }} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-[10px] hover:bg-[#d4b5b9] tracking-wider uppercase">
+              <Plus className="w-3 h-3 mr-1" /> Crear
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setShowJoin(true)} className="h-8 rounded-sm text-xs border-[rgba(244,221,224,0.15)] text-[#f4dde0] hover:bg-[rgba(244,221,224,0.05)]">
-              <LogIn className="w-3.5 h-3.5 mr-1" /> Unirse
+            <Button size="sm" variant="outline" onClick={() => { setShowJoin(true); setError("") }} className="h-8 rounded-sm text-[10px] border-[#4f4445] text-[#9b8e8f] hover:text-[#f4dde0] hover:bg-[rgba(159,142,143,0.06)] tracking-wider uppercase">
+              <LogIn className="w-3 h-3 mr-1" /> Unirse
             </Button>
-          </div>
+          </motion.div>
         ) : showCreate ? (
-          <div className="flex gap-2">
+          <motion.div
+            key="create"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="space-y-2"
+          >
             <Input
-              placeholder="Nombre"
+              placeholder="Nombre de la sala"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-              className="h-8 text-sm w-40 bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
+              className="h-8 text-xs bg-[#1b1012] border-[#4f4445] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleCreate} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
-              Crear
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
-              Cancelar
-            </Button>
-          </div>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleCreate} disabled={loading} className="h-7 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-[10px] hover:bg-[#d4b5b9]">
+                Crear sala
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setShowCreate(false); setError("") }} className="h-7 text-[10px] text-[#9b8e8f] hover:text-[#f4dde0]">
+                Cancelar
+              </Button>
+            </div>
+          </motion.div>
         ) : (
-          <div className="flex gap-2">
+          <motion.div
+            key="join"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="space-y-2"
+          >
             <Input
-              placeholder="Código"
+              placeholder="Código de 6 caracteres"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && handleJoin()}
               maxLength={6}
-              className="h-8 text-sm w-28 text-center font-mono tracking-wider bg-[#1b1012] border-[rgba(244,221,224,0.1)] text-[#f4dde0] rounded-sm"
+              className="h-8 text-xs text-center font-mono tracking-wider bg-[#1b1012] border-[#4f4445] text-[#f4dde0] rounded-sm"
               autoFocus
             />
-            <Button size="sm" onClick={handleJoin} disabled={loading} className="h-8 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-xs hover:bg-[#d4b5b9]">
-              Unirse
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowJoin(false)} className="h-8 text-xs text-[#9b8e8f] hover:text-[#f4dde0]">
-              Cancelar
-            </Button>
-          </div>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleJoin} disabled={loading} className="h-7 rounded-sm bg-[#debfc3] text-[#3f2b2e] text-[10px] hover:bg-[#d4b5b9]">
+                Unirse
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setShowJoin(false); setError("") }} className="h-7 text-[10px] text-[#9b8e8f] hover:text-[#f4dde0]">
+                Cancelar
+              </Button>
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </motion.div>
   )
 }

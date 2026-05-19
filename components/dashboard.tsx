@@ -7,12 +7,30 @@ import { SearchCommand } from "./search-command"
 import { StatusFilter } from "./status-filter"
 import { Button } from "@/components/ui/button"
 import { Plus, Film, Clapperboard } from "lucide-react"
+import { GroupManager } from "./group-manager"
 import type { WatchlistItemWithTmdb } from "@/types"
-import type { Group } from "@prisma/client"
+
+interface GroupMember {
+  id: string
+  role: string
+  user: {
+    id: string
+    name: string | null
+    image: string | null
+  }
+}
+
+interface GroupWithMembers {
+  id: string
+  name: string
+  inviteCode: string
+  createdAt: Date
+  members: GroupMember[]
+}
 
 interface DashboardProps {
   initialItems: WatchlistItemWithTmdb[]
-  group: Group | null
+  group: GroupWithMembers | null
   userId: string
 }
 
@@ -178,16 +196,10 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
             </div>
           </div>
 
-          {/* Shared status */}
-          {group && (
-            <div className="p-4 border border-[#4f4445] rounded-lg bg-[#291c1e]">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-[#ffd65b]" />
-                <span className="text-xs text-[#f4dde0]">Sala compartida activa</span>
-              </div>
-              <p className="text-[10px] text-[#9b8e8f]">{group.name}</p>
-            </div>
-          )}
+          {/* Group Manager */}
+          <GroupManager group={group} onGroupChange={() => {
+            window.location.reload()
+          }} />
         </div>
       </div>
 
