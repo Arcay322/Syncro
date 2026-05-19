@@ -10,10 +10,11 @@ import { Diamond, Ticket } from "lucide-react"
 export default function LoginPage() {
   const router = useRouter()
   const [isRegister, setIsRegister] = useState(false)
-  const [username, setUsername] = useState("")
+  const [loginId, setLoginId] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [username, setUsername] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -51,7 +52,7 @@ export default function LoginPage() {
       }
     } else {
       const result = await signIn("credentials", {
-        username: username || email,
+        username: loginId,
         password,
         redirect: false,
       })
@@ -99,7 +100,7 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-            {isRegister && (
+            {isRegister ? (
               <>
                 <div>
                   <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Nombre</label>
@@ -112,7 +113,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario</label>
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario (opcional)</label>
                   <Input
                     type="text"
                     value={username}
@@ -121,29 +122,26 @@ export default function LoginPage() {
                     placeholder="usuario123"
                   />
                 </div>
+                <div>
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Correo electrónico</label>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                    placeholder="correo@ejemplo.com"
+                  />
+                </div>
               </>
-            )}
-            
-            <div>
-              <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Correo electrónico</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required={isRegister}
-                className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
-                placeholder="correo@ejemplo.com"
-              />
-            </div>
-            
-            {!isRegister && (
+            ) : (
               <div>
                 <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario o correo</label>
                 <Input
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required={!isRegister}
+                  value={loginId}
+                  onChange={(e) => setLoginId(e.target.value)}
+                  required
                   className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
                   placeholder="usuario o correo"
                 />
