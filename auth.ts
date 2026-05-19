@@ -7,6 +7,10 @@ import bcrypt from "bcryptjs"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -53,4 +57,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
   trustHost: true,
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+        token.name = user.name
+        token.picture = user.image
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
+        session.user.email = token.email as string
+        session.user.name = token.name as string
+        session.user.image = token.picture as string | null
+      }
+      return session
+    },
+    async authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user
+      const isOnLoginPage = nextUrl.pathname.startsWith("/login")
+      const isOnApiAuth = nextUrl.pathname.startsWith("/api/auth")
+      
+      if (isOnApiAuth) return true
+      if (isOnLoginPage) {
+        if (isLoggedIn) return Response.redirect(new URL("/", nextUrl))
+        return true
+      }
+      if (!isLoggedIn) return Response.redirect(new URL("/login", nextUrl))
+      return true
+    },
+  },
 })

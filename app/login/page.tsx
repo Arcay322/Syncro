@@ -57,11 +57,14 @@ export default function LoginPage() {
         password,
         redirect: false,
       })
+      console.log("SignIn result:", result)
       if (result?.ok) {
         router.push("/")
         router.refresh()
+      } else if (result?.error) {
+        setError(result.error === "CredentialsSignin" ? "Email o contraseña incorrectos" : result.error)
       } else {
-        setError("Email o contraseña incorrectos")
+        setError("Error al iniciar sesión")
       }
     }
     setLoading(false)
