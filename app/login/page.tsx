@@ -10,6 +10,7 @@ import { Diamond, Ticket } from "lucide-react"
 export default function LoginPage() {
   const router = useRouter()
   const [isRegister, setIsRegister] = useState(false)
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
@@ -22,12 +23,11 @@ export default function LoginPage() {
     setLoading(true)
 
     if (isRegister) {
-      // Register
       try {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email, password, name, username }),
         })
         const data = await res.json()
         if (!res.ok) {
@@ -35,9 +35,8 @@ export default function LoginPage() {
           setLoading(false)
           return
         }
-        // Auto login after register
         const result = await signIn("credentials", {
-          email,
+          username: email,
           password,
           redirect: false,
         })
@@ -51,18 +50,16 @@ export default function LoginPage() {
         setError("Error de conexión")
       }
     } else {
-      // Login
       const result = await signIn("credentials", {
-        email,
+        username: username || email,
         password,
         redirect: false,
       })
-      console.log("SignIn result:", result)
       if (result?.ok) {
         router.push("/")
         router.refresh()
       } else if (result?.error) {
-        setError(result.error === "CredentialsSignin" ? "Email o contraseña incorrectos" : result.error)
+        setError(result.error === "CredentialsSignin" ? "Usuario o contraseña incorrectos" : result.error)
       } else {
         setError("Error al iniciar sesión")
       }
@@ -76,7 +73,7 @@ export default function LoginPage() {
 
   return (
     <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-4 bg-[#1b1012]">
-      {/* Top Logo */}
+      {/* Logo */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
         <div className="relative">
           <Diamond className="w-5 h-5 text-[#f5c518]" />
@@ -88,48 +85,70 @@ export default function LoginPage() {
         <div className="h-[2px] w-16 bg-gradient-to-r from-transparent via-[#f5c518] to-transparent absolute -bottom-1 left-1/2 -translate-x-1/2" />
       </div>
 
-      {/* Login Card */}
+      {/* Card */}
       <div className="relative z-10 w-full max-w-sm">
         <div className="absolute -inset-[1px] bg-gradient-to-b from-[rgba(222,191,195,0.12)] to-transparent rounded-lg opacity-50" />
         
         <div className="relative bg-[#2c1a1d]/80 border border-[rgba(222,191,195,0.08)] rounded-lg p-8">
-          {/* Title */}
           <h2 className="text-center text-sm font-display font-semibold text-[#f4dde0] mb-6 tracking-wide">
-            {isRegister ? "Crear Cuenta" : "Iniciar Sesión"}
+            {isRegister ? "Crear cuenta" : "Iniciar sesión"}
           </h2>
 
-          {/* Error */}
           {error && (
             <p className="text-center text-xs text-[#ffb4ab] mb-4">{error}</p>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4 mb-6">
             {isRegister && (
-              <div>
-                <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Nombre</label>
-                <Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required={isRegister}
-                  className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
-                  placeholder="Tu nombre"
-                />
-              </div>
+              <>
+                <div>
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Nombre</label>
+                  <Input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                    placeholder="Tu nombre"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario</label>
+                  <Input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                    placeholder="usuario123"
+                  />
+                </div>
+              </>
             )}
             
             <div>
-              <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Email</label>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Correo electrónico</label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                required={isRegister}
                 className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
                 placeholder="correo@ejemplo.com"
               />
             </div>
+            
+            {!isRegister && (
+              <div>
+                <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario o correo</label>
+                <Input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required={!isRegister}
+                  className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
+                  placeholder="usuario o correo"
+                />
+              </div>
+            )}
             
             <div>
               <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Contraseña</label>
@@ -149,18 +168,16 @@ export default function LoginPage() {
               className="w-full h-11 gap-2 text-xs font-semibold tracking-[0.1em] uppercase rounded-md bg-[#debfc3] text-[#1b1012] hover:bg-[#d4b5b9] transition-colors disabled:opacity-50" 
             >
               <Ticket className="w-4 h-4" />
-              {loading ? "Cargando..." : isRegister ? "Crear cuenta" : "Enter the Theater"}
+              {loading ? "Cargando..." : isRegister ? "Crear cuenta" : "Entrar al teatro"}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[rgba(222,191,195,0.15)]" />
             <span className="text-[8px] tracking-[0.2em] uppercase text-[#9b8e8f]">o</span>
             <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[rgba(222,191,195,0.15)]" />
           </div>
 
-          {/* Google */}
           <Button 
             onClick={handleGoogle}
             className="w-full h-10 gap-2 text-xs font-medium tracking-wider rounded-md bg-transparent border border-[rgba(222,191,195,0.2)] text-[#debfc3] hover:bg-[rgba(222,191,195,0.06)] transition-colors" 
@@ -174,7 +191,6 @@ export default function LoginPage() {
             Continuar con Google
           </Button>
 
-          {/* Toggle */}
           <p className="text-center text-[10px] text-[#9b8e8f] mt-5 tracking-wider">
             {isRegister ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
             <button
@@ -187,13 +203,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="absolute bottom-8 flex items-center gap-6">
         <span className="text-[9px] tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] cursor-pointer transition-colors">
-          Archives
+          Archivo
         </span>
         <span className="text-[9px] tracking-[0.15em] uppercase text-[#9b8e8f] hover:text-[#f4dde0] cursor-pointer transition-colors">
-          Support
+          Soporte
         </span>
       </div>
     </div>
