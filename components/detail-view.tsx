@@ -19,6 +19,8 @@ import {
   Play,
   ChevronRight,
   Loader2,
+  AlertTriangle,
+  Skull,
 } from "lucide-react"
 import type { WatchlistItemWithTmdb } from "@/types"
 
@@ -154,6 +156,20 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   const handleNotesSave = () => {
     updateItem({ notes })
   }
+
+  const handleConfession = () => {
+    const season = currentItem.currentSeason || 1
+    const episode = currentItem.currentEpisode || 0
+    const confessionText = `[DELITO] ${new Date().toLocaleDateString("es-ES")}: Me adelanté y vi hasta el episodio S${season}E${episode} sin mi compañero/a de visionado.`
+    const newNotes = notes ? `${notes}\n\n${confessionText}` : confessionText
+    setNotes(newNotes)
+    updateItem({ notes: newNotes })
+  }
+
+  // Parse confessions from notes
+  const confessions = notes
+    ? notes.split("\n").filter((line) => line.trim().startsWith("[DELITO]"))
+    : []
 
   const handleEpisodeWatched = (episodeNumber: number) => {
     if (!isTv) return
@@ -302,6 +318,18 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                   Notas
                 </Button>
 
+                {isTv && currentItem.groupId && (
+                  <Button
+                    variant="outline"
+                    onClick={handleConfession}
+                    disabled={saving}
+                    className="rounded-lg border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 px-4 py-5 gap-2"
+                  >
+                    <Skull className="w-4 h-4" />
+                    Botón del Delito
+                  </Button>
+                )}
+
                 <div className="flex items-center gap-2">
                   <StarRating value={rating} onChange={handleRatingChange} />
                   {rating > 0 && (
@@ -410,6 +438,34 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           </div>
         </motion.div>
       </div>
+
+      {/* Confessions Section */}
+      {confessions.length > 0 && (
+        <div className="px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="p-5 rounded-xl bg-red-500/5 border border-red-500/20 space-y-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-400" />
+                <h3 className="text-sm font-medium text-red-400 uppercase tracking-[0.15em] font-serif">
+                  Delitos Conocidos
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {confessions.map((confession, i) => (
+                  <p key={i} className="text-xs text-[#9B8E8F] font-serif pl-6 border-l border-red-500/20">
+                    {confession.replace("[DELITO] ", "")}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Decorative Line */}
       <div className="px-4">
