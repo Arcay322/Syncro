@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -28,7 +27,7 @@ export default function LoginPage() {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name, username }),
+          body: JSON.stringify({ email, password, name }),
         })
         const data = await res.json()
         if (!res.ok) {
@@ -37,7 +36,7 @@ export default function LoginPage() {
           return
         }
         const result = await signIn("credentials", {
-          username: email,
+          username: loginId,
           password,
           redirect: false,
         })
@@ -110,16 +109,6 @@ export default function LoginPage() {
                     onChange={(e) => setName(e.target.value)}
                     className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
                     placeholder="Tu nombre"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] tracking-[0.15em] uppercase text-[#9b8e8f] mb-1.5 block">Usuario (opcional)</label>
-                  <Input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="h-10 bg-[#1b1012] border-[rgba(222,191,195,0.15)] text-[#f4dde0] rounded-md text-sm focus:ring-1 focus:ring-[#debfc3]/30 focus:border-[#debfc3]/30"
-                    placeholder="usuario123"
                   />
                 </div>
                 <div>
