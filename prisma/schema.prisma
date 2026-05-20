@@ -55,10 +55,13 @@ model User {
   emailVerified DateTime?       @map("email_verified")
   image         String?
   password      String?
+  vibe          String?
+  vibeUpdatedAt DateTime?       @map("vibe_updated_at")
   accounts      Account[]
   sessions      Session[]
   watchlist     WatchlistItem[]
   groupMembers  GroupMember[]
+  crimes        Crime[]
 
   @@map("users")
 }
@@ -69,6 +72,7 @@ model Group {
   inviteCode String          @unique @map("invite_code")
   members    GroupMember[]
   watchlist  WatchlistItem[]
+  crimes     Crime[]
   createdAt  DateTime        @default(now()) @map("created_at")
 
   @@map("groups")
@@ -111,6 +115,7 @@ model WatchlistItem {
   currentSeason  Int?        @map("current_season")
   currentEpisode Int?        @map("current_episode")
   currentMinute  Int?        @map("current_minute")
+  genres         String[]    @default([])
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
@@ -120,4 +125,21 @@ model WatchlistItem {
   @@unique([userId, tmdbId])
   @@unique([groupId, tmdbId])
   @@map("watchlist_items")
+}
+
+model Crime {
+  id        String   @id @default(cuid())
+  groupId   String   @map("group_id")
+  userId    String   @map("user_id")
+  tmdbId    Int      @map("tmdb_id")
+  title     String
+  season    Int
+  episode   Int
+  penance   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("crimes")
 }

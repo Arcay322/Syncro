@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Navbar } from "@/components/navbar"
 import { PerfilView } from "@/components/perfil-view"
+import { getActiveGroupId } from "@/lib/active-group"
 
 export default async function PerfilPage() {
   const session = await auth()
@@ -30,19 +31,30 @@ export default async function PerfilPage() {
     where: { userId: user.id, groupId: null, status: "COMPLETED" },
   })
 
-  const groupMember = await prisma.groupMember.findFirst({
+  const memberships = await prisma.groupMember.findMany({
     where: { userId: user.id },
-    include: { group: true },
+    include: {
+      group: {
+        include: {
+          members: { include: { user: { select: { id: true, name: true, image: true } } } },
+        },
+      },
+    },
   })
+  const groups = memberships.map((m) => ({ ...m.group, role: m.role }))
+  const activeGroupId = await getActiveGroupId()
+  const validGroupId = groups.find((g) => g.id === activeGroupId)?.id ?? null
+
+  const firstGroup = memberships[0]?.group ?? null
 
   return (
     <>
-      <Navbar user={user} />
+      <Navbar user={user} groups={groups} activeGroupId={validGroupId} />
       <main className="flex-1">
         <PerfilView
           user={user}
           stats={{ totalItems, completedItems }}
-          groupName={groupMember?.group.name || null}
+          groupName={firstGroup?.name || null}
         />
       </main>
     </>

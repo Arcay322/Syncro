@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { getTmdbImageUrl } from "@/lib/tmdb"
 import {
@@ -19,11 +19,17 @@ import {
   Diamond,
   Play,
   ChevronRight,
+  ChevronLeft,
   Loader2,
   AlertTriangle,
   Skull,
   Check,
   Pause,
+  Clapperboard,
+  User2,
+  X,
+  Flame,
+  FileText,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -88,6 +94,272 @@ function StarRating({ value, onChange, size = "md" }: { value: number; onChange?
   )
 }
 
+// ──────────────── Cast Carousel ────────────────
+function CastCarousel({ cast }: { cast: any[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+
+  const checkScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 10)
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10)
+  }
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -240 : 240, behavior: "smooth" })
+  }
+
+  if (!cast || cast.length === 0) return null
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-[#DEBFC3] uppercase tracking-[0.15em] font-serif">
+          Reparto
+        </h3>
+        <div className="flex gap-1">
+          <button
+            onClick={() => scroll("left")}
+            disabled={!canScrollLeft}
+            className="w-7 h-7 rounded-full border border-[#4F4445]/50 flex items-center justify-center text-[#9B8E8F] hover:text-[#DEBFC3] hover:border-[#DEBFC3]/30 disabled:opacity-30 transition-all"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            disabled={!canScrollRight}
+            className="w-7 h-7 rounded-full border border-[#4F4445]/50 flex items-center justify-center text-[#9B8E8F] hover:text-[#DEBFC3] hover:border-[#DEBFC3]/30 disabled:opacity-30 transition-all"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        onScroll={checkScroll}
+        className="flex gap-3 overflow-x-auto scrollbar-none pb-2"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {cast.slice(0, 20).map((actor: any) => (
+          <motion.div
+            key={actor.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex-none w-[90px] text-center"
+          >
+            <div className="relative w-[90px] h-[120px] rounded-xl overflow-hidden bg-[#291C1E] mb-2 ring-1 ring-[#4F4445]/30">
+              {actor.profile_path ? (
+                <Image
+                  src={getTmdbImageUrl(actor.profile_path, "w185")}
+                  alt={actor.name}
+                  fill
+                  sizes="90px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <User2 className="w-8 h-8 text-[#4F4445]" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1B1012]/80 to-transparent" />
+            </div>
+            <p className="text-[11px] font-medium text-[#DEBFC3] leading-tight line-clamp-2 font-serif">
+              {actor.name}
+            </p>
+            <p className="text-[10px] text-[#4F4445] mt-0.5 line-clamp-1">
+              {actor.character}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ──────────────── Botón del Delito Modal ────────────────
+function DelitoModal({
+  item,
+  open,
+  onClose,
+  crimes,
+  onCrimeRegistered,
+}: {
+  item: WatchlistItemWithTmdb
+  open: boolean
+  onClose: () => void
+  crimes: any[]
+  onCrimeRegistered: (crime: any) => void
+}) {
+  const [loading, setLoading] = useState(false)
+  const [newCrime, setNewCrime] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleConfess = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/crimes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tmdbId: item.tmdbId,
+          title: item.title,
+          season: item.currentSeason || 1,
+          episode: item.currentEpisode || 0,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || "Error al registrar el delito")
+      } else {
+        setNewCrime(data.crime)
+        onCrimeRegistered(data.crime)
+      }
+    } catch {
+      setError("Error de conexión")
+    }
+    setLoading(false)
+  }
+
+  if (!open) return null
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 60, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="w-full max-w-md bg-[#1B1012] border border-red-500/30 rounded-2xl overflow-hidden shadow-2xl shadow-red-900/30"
+        >
+          {/* Header */}
+          <div className="relative p-6 bg-gradient-to-b from-red-950/40 to-transparent border-b border-red-500/20">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#291C1E] text-[#9B8E8F] hover:text-[#DEBFC3] transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-red-500/15 flex items-center justify-center">
+                <Skull className="w-6 h-6 text-red-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-red-400 font-serif">Botón del Delito</h2>
+                <p className="text-xs text-[#9B8E8F]">Confesionario del Cineclub</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {/* Current progress context */}
+            <div className="p-3 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/30">
+              <p className="text-xs text-[#9B8E8F] font-serif">
+                📺 <span className="text-[#DEBFC3] font-medium">{item.title}</span>
+                {item.currentSeason && item.currentEpisode
+                  ? ` · S${item.currentSeason}E${item.currentEpisode}`
+                  : ""}
+              </p>
+              <p className="text-[11px] text-[#4F4445] mt-1">
+                ¿Te adelantaste hasta este punto sin tu pareja? ¡Reconócelo!
+              </p>
+            </div>
+
+            {/* New crime result */}
+            {newCrime ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-3"
+              >
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 space-y-2">
+                  <div className="flex items-center gap-2 text-red-400">
+                    <Flame className="w-4 h-4" />
+                    <p className="text-xs font-bold uppercase tracking-wider">¡Delito registrado!</p>
+                  </div>
+                  <p className="text-sm text-[#DEBFC3] font-serif font-medium">Tu penitencia:</p>
+                  <p className="text-sm text-[#FFD65B] font-serif italic leading-relaxed">
+                    "{newCrime.penance}"
+                  </p>
+                </div>
+                <Button
+                  onClick={() => { setNewCrime(null); onClose() }}
+                  className="w-full rounded-xl bg-[#DEBFC3] text-[#3F2B2E] hover:bg-[#d4b5b9] text-sm"
+                >
+                  Entendido, me arrepiento 🙏
+                </Button>
+              </motion.div>
+            ) : (
+              <div className="space-y-3">
+                {error && (
+                  <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <p className="text-xs text-red-400">{error}</p>
+                  </div>
+                )}
+                <Button
+                  onClick={handleConfess}
+                  disabled={loading}
+                  className="w-full rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 hover:bg-red-500/30 hover:text-red-200 gap-2 py-5"
+                >
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Skull className="w-4 h-4" />
+                  )}
+                  {loading ? "Registrando..." : "Confesar mi delito"}
+                </Button>
+                <p className="text-[10px] text-[#4F4445] text-center font-serif italic">
+                  La confesión es el primer paso a la redención cinematográfica.
+                </p>
+              </div>
+            )}
+
+            {/* Crime history */}
+            {crimes.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-[#9B8E8F] uppercase tracking-[0.12em] font-serif">
+                  Delitos anteriores
+                </p>
+                <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-none" style={{ scrollbarWidth: "none" }}>
+                  {crimes.map((crime: any) => (
+                    <div
+                      key={crime.id}
+                      className="p-2.5 rounded-lg bg-[#291C1E]/60 border border-red-500/10 space-y-0.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-medium text-[#DEBFC3] font-serif">
+                          {crime.title} S{crime.season}E{crime.episode}
+                        </span>
+                        <span className="text-[10px] text-[#4F4445]">
+                          {new Date(crime.createdAt).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-[#FFD65B]/80 italic font-serif leading-snug">
+                        {crime.penance}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+// ──────────────── Main Component ────────────────
 export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   const router = useRouter()
   const [currentItem, setCurrentItem] = useState(item)
@@ -95,14 +367,35 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   const [selectedSeason, setSelectedSeason] = useState(currentItem.currentSeason || 1)
   const [seasonEpisodes, setSeasonEpisodes] = useState<any[]>([])
   const [loadingSeason, setLoadingSeason] = useState(false)
+  const getInitialNotes = (raw: string | null): Record<string, string> => {
+    if (!raw) return {}
+    try {
+      if (raw.trim().startsWith("{")) {
+        return JSON.parse(raw)
+      }
+    } catch {}
+    return { global: raw }
+  }
+
   const [saving, setSaving] = useState(false)
-  const [notes, setNotes] = useState(currentItem.notes || "")
+  const [notesDict, setNotesDict] = useState<Record<string, string>>(getInitialNotes(currentItem.notes))
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null)
   const [rating, setRating] = useState(currentItem.rating || 0)
   const [showNotes, setShowNotes] = useState(false)
+  const [showDelito, setShowDelito] = useState(false)
+  const [expandedNoteEpisode, setExpandedNoteEpisode] = useState<number | null>(null)
+  const [crimes, setCrimes] = useState<any[]>([])
+  const [loadingCrimes, setLoadingCrimes] = useState(false)
 
   const isTv = item.mediaType === "tv"
   const totalEpisodes = seasons.reduce((acc: number, s: any) => acc + (s.episode_count || 0), 0)
-  const currentEp = currentItem.currentEpisode || 0
+
+  // Extract cast & director from credits
+  const cast: any[] = tmdbDetails.credits?.cast || []
+  const crew: any[] = tmdbDetails.credits?.crew || []
+  const director = crew.find((c: any) => c.job === "Director" || c.job === "Series Director" || c.department === "Directing")
+  const creators = tmdbDetails.created_by || []
+
   const getWatchedEpisodesCount = () => {
     if (!isTv) return 0
     let count = 0
@@ -144,6 +437,22 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
     }
   }, [isTv, selectedSeason, fetchSeason])
 
+  // Fetch crimes when delito modal opens
+  useEffect(() => {
+    if (showDelito && currentItem.groupId) {
+      setLoadingCrimes(true)
+      fetch("/api/crimes")
+        .then((r) => r.json())
+        .then((data) => {
+          // Filter crimes relevant to this title
+          const relevant = (data.crimes || []).filter((c: any) => c.tmdbId === item.tmdbId)
+          setCrimes(relevant)
+        })
+        .catch(() => {})
+        .finally(() => setLoadingCrimes(false))
+    }
+  }, [showDelito, currentItem.groupId, item.tmdbId])
+
   const updateItem = async (data: Partial<WatchlistItemWithTmdb>) => {
     setSaving(true)
     const res = await fetch(`/api/watchlist/${item.id}`, {
@@ -157,6 +466,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
       router.refresh()
     }
     setSaving(false)
+    return res.ok
   }
 
   const handleNextEpisode = () => {
@@ -181,23 +491,15 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
     updateItem({ rating: value })
   }
 
-  const handleNotesSave = () => {
-    updateItem({ notes })
+  const handleNotesSave = async (key: string, value: string) => {
+    const updated = { ...notesDict, [key]: value }
+    setNotesDict(updated)
+    const ok = await updateItem({ notes: JSON.stringify(updated) })
+    if (ok) {
+      setSaveSuccess(key)
+      setTimeout(() => setSaveSuccess(null), 2500)
+    }
   }
-
-  const handleConfession = () => {
-    const season = currentItem.currentSeason || 1
-    const episode = currentItem.currentEpisode || 0
-    const confessionText = `[DELITO] ${new Date().toLocaleDateString("es-ES")}: Me adelanté y vi hasta el episodio S${season}E${episode} sin mi compañero/a de visionado.`
-    const newNotes = notes ? `${notes}\n\n${confessionText}` : confessionText
-    setNotes(newNotes)
-    updateItem({ notes: newNotes })
-  }
-
-  // Parse confessions from notes
-  const confessions = notes
-    ? notes.split("\n").filter((line) => line.trim().startsWith("[DELITO]"))
-    : []
 
   const handleEpisodeWatched = (episodeNumber: number) => {
     if (!isTv) return
@@ -277,6 +579,16 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                   {item.title}
                 </h1>
 
+                {/* Director / Creator */}
+                {(director || creators.length > 0) && (
+                  <p className="text-sm text-[#9B8E8F] mt-2 font-serif flex items-center gap-1.5">
+                    <Clapperboard className="w-3.5 h-3.5" />
+                    {creators.length > 0
+                      ? `Creada por ${creators.map((c: any) => c.name).join(", ")}`
+                      : `Dirigida por ${director?.name}`}
+                  </p>
+                )}
+
                 {/* Meta */}
                 <div className="flex flex-wrap items-center gap-3 mt-3">
                   {year && (
@@ -332,23 +644,25 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button
-                  onClick={handleNextEpisode}
-                  disabled={saving || isCompleted}
-                  className="gap-2 rounded-lg bg-[#DEBFC3] text-[#3F2B2E] hover:bg-[#d4b5b9] px-6 py-5 text-sm font-semibold tracking-wide uppercase shadow-lg shadow-[rgba(222,191,195,0.15)]"
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
-                  {isTv ? "Reanudar Producción" : "Reanudar"}
-                </Button>
-
                 <DropdownMenu>
                   <DropdownMenuTrigger>
                     <div
-                      className="flex h-10 select-none items-center justify-center rounded-lg border border-[#4F4445] bg-transparent px-5 text-xs font-semibold tracking-wide uppercase text-[#9B8E8F] hover:bg-[#291C1E] hover:text-[#DEBFC3] cursor-pointer transition-all duration-300 gap-2"
+                      className={`flex h-11 items-center justify-center gap-2 rounded-lg px-6 text-sm font-semibold tracking-wide uppercase shadow-lg transition-all cursor-pointer ${
+                        currentItem.status === "COMPLETED" ? "bg-emerald-500 text-emerald-950 hover:bg-emerald-400 shadow-emerald-500/20" :
+                        currentItem.status === "WATCHING" ? "bg-[#FFD65B] text-[#3F2B2E] hover:bg-[#e6c152] shadow-[#FFD65B]/20" :
+                        currentItem.status === "DROPPED" ? "bg-red-500 text-white hover:bg-red-400 shadow-red-500/20" :
+                        currentItem.status === "ON_HOLD" ? "bg-[#DEBFC3] text-[#3F2B2E] hover:bg-[#c9ada0] shadow-[#DEBFC3]/20" :
+                        "bg-[#9B8E8F] text-[#1B1012] hover:bg-[#857a7b] shadow-[#9B8E8F]/20"
+                      } ${saving ? 'opacity-50 pointer-events-none' : ''}`}
                     >
-                      <span className="text-xs font-semibold tracking-wide uppercase">
-                        Estado: {statusLabels[currentItem.status] || currentItem.status}
-                      </span>
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 
+                        currentItem.status === "COMPLETED" ? <Check className="w-4 h-4 stroke-[3]" /> :
+                        currentItem.status === "WATCHING" ? <Play className="w-4 h-4 fill-current" /> :
+                        currentItem.status === "ON_HOLD" ? <Pause className="w-4 h-4 fill-current" /> :
+                        currentItem.status === "DROPPED" ? <Skull className="w-4 h-4" /> :
+                        <Clock className="w-4 h-4" />
+                      }
+                      {statusLabels[currentItem.status] || currentItem.status}
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="bg-[#291C1E] border border-[#4F4445] min-w-[150px] rounded-md shadow-2xl z-30">
@@ -383,10 +697,10 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                   Notas
                 </Button>
 
-                {isTv && currentItem.groupId && (
+                {currentItem.groupId && (
                   <Button
                     variant="outline"
-                    onClick={handleConfession}
+                    onClick={() => setShowDelito(true)}
                     disabled={saving}
                     className="rounded-lg border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 px-4 py-5 gap-2"
                   >
@@ -433,14 +747,26 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
           <div className="max-w-4xl mx-auto space-y-3">
             <label className="text-sm font-medium text-[#DEBFC3] font-serif">Notas del Cinéfilo</label>
             <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Escribe tus impresiones sobre esta producción..."
+              value={notesDict["global"] || ""}
+              onChange={(e) => setNotesDict({ ...notesDict, global: e.target.value })}
+              placeholder="Escribe tus impresiones generales sobre esta producción..."
               className="w-full min-h-[120px] px-4 py-3 rounded-xl bg-[#1B1012] border border-[#4F4445]/50 text-[#DEBFC3] placeholder:text-[#4F4445] focus:ring-2 focus:ring-[#FFD65B]/30 focus:border-[#FFD65B]/50 outline-none transition-all resize-none text-sm leading-relaxed font-serif"
             />
-            <div className="flex justify-end">
+            <div className="flex justify-end items-center gap-3">
+              <AnimatePresence>
+                {saveSuccess === "global" && (
+                  <motion.span
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="text-xs text-emerald-400 font-medium flex items-center gap-1"
+                  >
+                    <Check className="w-3 h-3" /> ¡Guardado!
+                  </motion.span>
+                )}
+              </AnimatePresence>
               <Button
-                onClick={handleNotesSave}
+                onClick={() => handleNotesSave("global", notesDict["global"] || "")}
                 disabled={saving}
                 className="rounded-lg bg-[#DEBFC3] text-[#3F2B2E] hover:bg-[#d4b5b9] text-xs px-4"
               >
@@ -455,6 +781,24 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
       <div className="px-4">
         <ArtDecoLine />
       </div>
+
+      {/* Cast & Director Section */}
+      {cast.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="px-4 max-w-5xl mx-auto"
+        >
+          <CastCarousel cast={cast} />
+        </motion.div>
+      )}
+
+      {cast.length > 0 && (
+        <div className="px-4">
+          <ArtDecoLine />
+        </div>
+      )}
 
       {/* Ratings Section */}
       <div className="px-4 space-y-6">
@@ -504,34 +848,6 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
         </motion.div>
       </div>
 
-      {/* Confessions Section */}
-      {confessions.length > 0 && (
-        <div className="px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="p-5 rounded-xl bg-red-500/5 border border-red-500/20 space-y-3">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-                <h3 className="text-sm font-medium text-red-400 uppercase tracking-[0.15em] font-serif">
-                  Delitos Conocidos
-                </h3>
-              </div>
-              <div className="space-y-2">
-                {confessions.map((confession, i) => (
-                  <p key={i} className="text-xs text-[#9B8E8F] font-serif pl-6 border-l border-red-500/20">
-                    {confession.replace("[DELITO] ", "")}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
       {/* Decorative Line */}
       <div className="px-4">
         <ArtDecoLine />
@@ -559,7 +875,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             </div>
 
             {/* Season Selector */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end max-w-xs">
               {seasons.map((s: any) => (
                 <button
                   key={s.season_number}
@@ -604,20 +920,24 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                   (selectedSeason === (currentItem.currentSeason || 1) && epNum === (currentItem.currentEpisode || 0) + 1) ||
                   (selectedSeason === (currentItem.currentSeason || 1) + 1 && (currentItem.currentEpisode || 0) === totalInSeason && epNum === 1)
 
+                const epKey = `S${selectedSeason}E${epNum}`
+                const hasNote = !!notesDict[epKey]
+                const isExpanded = expandedNoteEpisode === epNum
+
                 return (
-                  <motion.div
-                    key={ep.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    className={`group flex items-center gap-4 p-3.5 rounded-xl border transition-all ${
-                      isWatched
-                        ? "bg-[#291C1E]/40 border-[#4F4445]/20"
-                        : isCurrentlyWatching
-                        ? "bg-[#FFD65B]/5 border-[#FFD65B]/20"
-                        : "bg-transparent border-[#4F4445]/20 hover:bg-[#291C1E]/30"
-                    }`}
-                  >
+                  <div key={ep.id} className="flex flex-col gap-1">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className={`group flex items-center gap-4 p-3.5 rounded-xl border transition-all ${
+                        isWatched
+                          ? "bg-[#291C1E]/40 border-[#4F4445]/20"
+                          : isCurrentlyWatching
+                          ? "bg-[#FFD65B]/5 border-[#FFD65B]/20"
+                          : "bg-transparent border-[#4F4445]/20 hover:bg-[#291C1E]/30"
+                      }`}
+                    >
                     {/* Episode Number */}
                     <span className={`text-sm font-bold w-6 text-center font-serif ${
                       isWatched ? "text-[#4F4445]" : "text-[#9B8E8F]"
@@ -652,6 +972,17 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                       </span>
                     )}
 
+                    {/* Note Button */}
+                    <button
+                      onClick={() => setExpandedNoteEpisode(isExpanded ? null : epNum)}
+                      className={`shrink-0 p-1.5 rounded-md transition-colors ${
+                        hasNote || isExpanded ? "text-[#FFD65B] bg-[#FFD65B]/10" : "text-[#4F4445] hover:text-[#DEBFC3] hover:bg-[#DEBFC3]/10"
+                      }`}
+                      title="Notas del capítulo"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </button>
+
                     {/* Checkbox */}
                     <button
                       onClick={() => handleEpisodeWatched(epNum)}
@@ -664,7 +995,44 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                       )}
                     </button>
                   </motion.div>
-                )
+
+                  {/* Expandable Note Section */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="px-4 overflow-hidden"
+                      >
+                        <div className="bg-[#1B1012] border border-[#4F4445]/30 rounded-xl p-3 mb-2 flex flex-col gap-2">
+                          <textarea
+                            value={notesDict[epKey] || ""}
+                            onChange={(e) => setNotesDict({ ...notesDict, [epKey]: e.target.value })}
+                            placeholder={`Tus notas para el Episodio ${epNum}...`}
+                            className="w-full min-h-[80px] bg-transparent text-[#DEBFC3] placeholder:text-[#4F4445] text-xs resize-none outline-none font-serif"
+                          />
+                          <div className="flex justify-end items-center gap-3">
+                            {saveSuccess === epKey && (
+                              <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                                <Check className="w-3 h-3" /> Guardado
+                              </span>
+                            )}
+                            <Button
+                              onClick={() => handleNotesSave(epKey, notesDict[epKey] || "")}
+                              disabled={saving}
+                              size="sm"
+                              className="h-7 text-[10px] px-3 rounded-md bg-[#291C1E] text-[#9B8E8F] hover:text-[#DEBFC3] hover:bg-[#DEBFC3]/20"
+                            >
+                              {saving ? "Guardando..." : "Guardar nota"}
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )
               })
             ) : (
               <div className="text-center py-12 text-[#4F4445]">
@@ -720,6 +1088,15 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
       {/* Bottom Spacing */}
       <div className="h-12" />
+
+      {/* Delito Modal */}
+      <DelitoModal
+        item={currentItem}
+        open={showDelito}
+        onClose={() => setShowDelito(false)}
+        crimes={crimes}
+        onCrimeRegistered={(crime) => setCrimes((prev) => [crime, ...prev])}
+      />
     </div>
   )
 }

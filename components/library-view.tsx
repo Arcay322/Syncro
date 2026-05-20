@@ -6,12 +6,14 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { SearchCommand } from "@/components/search-command"
 import { getTmdbImageUrl } from "@/lib/tmdb"
-import { Search, Diamond, Filter, X, Play, Check, Clock, Bookmark, Star, Film } from "lucide-react"
+import { Search, Diamond, Filter, X, Play, Check, Clock, Bookmark, Star, Film, Plus } from "lucide-react"
 import type { WatchlistItemWithTmdb } from "@/types"
 
 interface LibraryViewProps {
   initialItems: WatchlistItemWithTmdb[]
+  groupId?: string | null
 }
 
 const statusFilters = [
@@ -63,11 +65,16 @@ function ArtDecoLine({ className = "" }: { className?: string }) {
   )
 }
 
-export function LibraryView({ initialItems }: LibraryViewProps) {
+export function LibraryView({ initialItems, groupId }: LibraryViewProps) {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [typeFilter, setTypeFilter] = useState("ALL")
-  const [items] = useState(initialItems)
+  const [items, setItems] = useState(initialItems)
+  const [addOpen, setAddOpen] = useState(false)
+
+  const handleItemAdded = (item: WatchlistItemWithTmdb) => {
+    setItems((prev) => [item, ...prev])
+  }
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
@@ -92,6 +99,17 @@ export function LibraryView({ initialItems }: LibraryViewProps) {
           </h1>
           <ArtDecoLine />
         </motion.div>
+
+        {/* Add button */}
+        <div className="flex justify-center mt-5">
+          <Button
+            onClick={() => setAddOpen(true)}
+            className="gap-2 h-10 px-6 rounded-lg bg-[#DEBFC3] text-[#3F2B2E] hover:bg-[#d4b5b9] text-sm font-semibold tracking-wide"
+          >
+            <Plus className="w-4 h-4" />
+            Agregar serie o película
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -212,6 +230,13 @@ export function LibraryView({ initialItems }: LibraryViewProps) {
           </div>
         </div>
       )}
+
+      <SearchCommand
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        onItemAdded={handleItemAdded}
+        groupId={groupId ?? undefined}
+      />
     </div>
   )
 }

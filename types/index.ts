@@ -26,6 +26,7 @@ export interface WatchlistItemWithTmdb {
   currentSeason: number | null
   currentEpisode: number | null
   currentMinute: number | null
+  genres: string[]
   createdAt: Date
   updatedAt: Date
 }

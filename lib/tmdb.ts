@@ -24,7 +24,7 @@ export async function searchTmdb(query: string) {
 
 export async function getTmdbDetails(id: number, mediaType: "movie" | "tv") {
   const res = await fetch(
-    `${TMDB_BASE_URL}/${mediaType}/${id}?language=es-ES`,
+    `${TMDB_BASE_URL}/${mediaType}/${id}?language=es-ES&append_to_response=credits`,
     { headers: getTmdbHeaders(), next: { revalidate: 3600 } }
   )
   if (!res.ok) throw new Error("TMDB details failed")

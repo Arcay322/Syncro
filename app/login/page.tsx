@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Image from "next/image"
 import { Diamond, Ticket } from "lucide-react"
 
 export default function LoginPage() {
@@ -74,16 +75,18 @@ export default function LoginPage() {
 
   return (
     <div className="h-full flex flex-col items-center justify-center relative overflow-hidden px-4 bg-[#1b1012]">
-      {/* Logo */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
-        <div className="relative">
-          <Diamond className="w-5 h-5 text-[#f5c518]" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#1b1012]" />
-          </div>
+      {/* Logo Container (Takes zero height in flex flow so the card stays dead center) */}
+      <div className="relative z-20 flex flex-col items-center w-full h-0 overflow-visible">
+        <div className="absolute -bottom-16 w-screen flex justify-center px-4 pointer-events-none">
+          <Image 
+            src="/logo-full.webp" 
+            alt="Syncro" 
+            width={1000} 
+            height={400} 
+            className="w-full max-w-[350px] md:max-w-[500px] lg:max-w-[600px] h-auto object-contain drop-shadow-[0_0_20px_rgba(255,214,91,0.2)]" 
+            priority 
+          />
         </div>
-        <span className="font-display text-lg font-semibold tracking-[0.2em] text-[#f5c518] uppercase">Syncro</span>
-        <div className="h-[2px] w-16 bg-gradient-to-r from-transparent via-[#f5c518] to-transparent absolute -bottom-1 left-1/2 -translate-x-1/2" />
       </div>
 
       {/* Card */}

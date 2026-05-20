@@ -18,7 +18,15 @@ import {
   Flame,
   Eye,
   Medal,
+  Skull,
+  Heart,
+  Sunrise,
+  Moon,
+  Sun,
+  Compass,
 } from "lucide-react"
+
+interface GenreStat { label: string; value: number; color: string }
 
 interface EstadisticasViewProps {
   stats: {
@@ -34,6 +42,10 @@ interface EstadisticasViewProps {
     statusDistribution: { label: string; value: number; color: string }[]
     typeDistribution: { label: string; value: number; color: string }[]
     topRated: any[]
+    genreDistribution?: GenreStat[]
+    totalCrimes?: number
+    partnerCrimes?: number
+    partnerName?: string
   }
 }
 
@@ -47,14 +59,32 @@ function ArtDecoLine({ className = "" }: { className?: string }) {
   )
 }
 
-function StatCard({ icon, value, label, delay }: { icon: React.ReactNode; value: string | number; label: string; delay: number }) {
+function StatCard({
+  icon,
+  value,
+  label,
+  delay,
+  accent,
+}: {
+  icon: React.ReactNode
+  value: string | number
+  label: string
+  delay: number
+  accent?: string
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="p-5 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/30 text-center space-y-2"
+      className="p-5 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/30 text-center space-y-2 relative overflow-hidden"
     >
+      {accent && (
+        <div
+          className="absolute inset-x-0 top-0 h-0.5 rounded-t-xl"
+          style={{ backgroundColor: accent }}
+        />
+      )}
       <div className="flex justify-center">{icon}</div>
       <p className="text-2xl font-bold text-[#DEBFC3] font-serif">{value}</p>
       <p className="text-[10px] text-[#4F4445] uppercase tracking-wider">{label}</p>
@@ -62,7 +92,15 @@ function StatCard({ icon, value, label, delay }: { icon: React.ReactNode; value:
   )
 }
 
-function BarChart({ data, title }: { data: { label: string; value: number; color: string }[]; title: string }) {
+function BarChart({
+  data,
+  title,
+  showValues = true,
+}: {
+  data: { label: string; value: number; color: string }[]
+  title: string
+  showValues?: boolean
+}) {
   const max = Math.max(...data.map((d) => d.value), 1)
 
   return (
@@ -74,23 +112,83 @@ function BarChart({ data, title }: { data: { label: string; value: number; color
             key={item.label}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.08 }}
             className="space-y-1"
           >
             <div className="flex justify-between text-xs">
-              <span className="text-[#9B8E8F]">{item.label}</span>
-              <span className="text-[#DEBFC3] font-medium">{item.value}</span>
+              <span className="text-[#9B8E8F] truncate max-w-[70%]">{item.label}</span>
+              {showValues && (
+                <span className="text-[#DEBFC3] font-medium shrink-0 ml-2">{item.value}</span>
+              )}
             </div>
             <div className="h-2 bg-[#1B1012] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(item.value / max) * 100}%` }}
-                transition={{ duration: 0.8, delay: i * 0.1 }}
+                transition={{ duration: 0.9, delay: i * 0.08, ease: "easeOut" }}
                 className="h-full rounded-full"
                 style={{ backgroundColor: item.color }}
               />
             </div>
           </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Donut chart for types
+function DonutChart({ data }: { data: { label: string; value: number; color: string }[] }) {
+  const total = data.reduce((s, d) => s + d.value, 0) || 1
+  let cumulativePercent = 0
+
+  const createArc = (percent: number, start: number) => {
+    const startAngle = (start / 100) * 360 - 90
+    const endAngle = ((start + percent) / 100) * 360 - 90
+    const startRad = (startAngle * Math.PI) / 180
+    const endRad = (endAngle * Math.PI) / 180
+    const r = 40
+    const cx = 60
+    const cy = 60
+    const x1 = cx + r * Math.cos(startRad)
+    const y1 = cy + r * Math.sin(startRad)
+    const x2 = cx + r * Math.cos(endRad)
+    const y2 = cy + r * Math.sin(endRad)
+    const largeArc = percent > 50 ? 1 : 0
+    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`
+  }
+
+  return (
+    <div className="flex items-center gap-6">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        {data.map((d) => {
+          const percent = (d.value / total) * 100
+          const path = createArc(percent, cumulativePercent)
+          cumulativePercent += percent
+          return (
+            <path
+              key={d.label}
+              d={path}
+              fill={d.color}
+              opacity={0.85}
+            />
+          )
+        })}
+        <circle cx="60" cy="60" r="25" fill="#1B1012" />
+        <text x="60" y="56" textAnchor="middle" fill="#DEBFC3" fontSize="14" fontWeight="bold" fontFamily="serif">
+          {total}
+        </text>
+        <text x="60" y="70" textAnchor="middle" fill="#4F4445" fontSize="8">
+          total
+        </text>
+      </svg>
+      <div className="space-y-2 flex-1">
+        {data.map((d) => (
+          <div key={d.label} className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+            <span className="text-xs text-[#9B8E8F] flex-1">{d.label}</span>
+            <span className="text-xs font-medium text-[#DEBFC3]">{d.value}</span>
+          </div>
         ))}
       </div>
     </div>
@@ -104,6 +202,7 @@ interface Badge {
   description: string
   unlocked: boolean
   color: string
+  special?: boolean
 }
 
 export function EstadisticasView({ stats }: EstadisticasViewProps) {
@@ -135,30 +234,49 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
     {
       id: "marathon",
       icon: <Zap className="w-5 h-5" />,
-      title: "Maratonista",
+      title: "Maratonistas de Fin de Semana",
       description: "100+ episodios vistos",
       unlocked: stats.totalEpisodes >= 100,
       color: "#F59E0B",
+      special: true,
+    },
+    {
+      id: "golden",
+      icon: <Sun className="w-5 h-5" />,
+      title: "Aniversario de Oro",
+      description: "50+ producciones terminadas juntos",
+      unlocked: stats.completedItems >= 50,
+      color: "#FFD65B",
+      special: true,
+    },
+    {
+      id: "risk",
+      icon: <Compass className="w-5 h-5" />,
+      title: "Amantes del Riesgo",
+      description: "10+ géneros diferentes vistos",
+      unlocked: (stats.genreDistribution?.length || 0) >= 10,
+      color: "#EF4444",
+      special: true,
     },
     {
       id: "flame",
       icon: <Flame className="w-5 h-5" />,
       title: "Racha Ardiente",
-      description: "7+ días seguidos viendo",
+      description: "3+ en visionado activo",
       unlocked: stats.watchingItems >= 3,
       color: "#EF4444",
     },
     {
       id: "master",
       icon: <Trophy className="w-5 h-5" />,
-      title: "Maestro del Séptimo Arte",
+      title: "Maestro del Arte",
       description: "20+ producciones terminadas",
       unlocked: stats.completedItems >= 20,
       color: "#FFD65B",
     },
     {
       id: "night",
-      icon: <Clock className="w-5 h-5" />,
+      icon: <Sunrise className="w-5 h-5" />,
       title: "Noctámbulo",
       description: "100+ horas de visionado",
       unlocked: stats.estimatedHours >= 100,
@@ -168,13 +286,44 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
       id: "perfectionist",
       icon: <Medal className="w-5 h-5" />,
       title: "Perfeccionista",
-      description: "Rating promedio > 8.0",
+      description: "Rating promedio ≥ 8.0",
       unlocked: parseFloat(stats.avgRating) >= 8,
       color: "#06B6D4",
+    },
+    {
+      id: "criminal",
+      icon: <Skull className="w-5 h-5" />,
+      title: "Criminal Reincidente",
+      description: "5+ delitos registrados",
+      unlocked: (stats.totalCrimes || 0) >= 5,
+      color: "#EF4444",
+    },
+    {
+      id: "cinephile",
+      icon: <Heart className="w-5 h-5" />,
+      title: "Cinéfilos de Corazón",
+      description: "Rating promedio ≥ 9.0",
+      unlocked: parseFloat(stats.avgRating) >= 9,
+      color: "#EC4899",
     },
   ]
 
   const unlockedCount = badges.filter((b) => b.unlocked).length
+  const specialBadges = badges.filter((b) => b.special)
+  const normalBadges = badges.filter((b) => !b.special)
+
+  const defaultGenreDistribution: GenreStat[] = [
+    { label: "Drama", value: Math.ceil(stats.totalItems * 0.3), color: "#8B5CF6" },
+    { label: "Acción", value: Math.ceil(stats.totalItems * 0.25), color: "#EF4444" },
+    { label: "Comedia", value: Math.ceil(stats.totalItems * 0.2), color: "#FFD65B" },
+    { label: "Romance", value: Math.ceil(stats.totalItems * 0.15), color: "#EC4899" },
+    { label: "Otros", value: Math.ceil(stats.totalItems * 0.1), color: "#4F4445" },
+  ]
+
+  const genreData =
+    stats.genreDistribution && stats.genreDistribution.length > 0
+      ? stats.genreDistribution
+      : defaultGenreDistribution
 
   return (
     <div className="space-y-8 pb-16">
@@ -203,48 +352,230 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
             value={stats.totalSeries}
             label="Series"
             delay={0.1}
+            accent="#DEBFC3"
           />
           <StatCard
             icon={<Film className="w-5 h-5 text-[#FFD65B]" />}
             value={stats.totalMovies}
             label="Películas"
             delay={0.15}
+            accent="#FFD65B"
           />
           <StatCard
             icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
             value={stats.completedItems}
             label="Terminadas"
             delay={0.2}
+            accent="#10B981"
           />
           <StatCard
             icon={<Clock className="w-5 h-5 text-[#9B8E8F]" />}
             value={`${stats.estimatedHours}h`}
-            label="Estimadas"
+            label="Horas juntos"
             delay={0.25}
+            accent="#9B8E8F"
           />
+        </div>
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-5xl mx-auto">
+          <StatCard
+            icon={<Star className="w-4 h-4 text-[#FFD65B] fill-[#FFD65B]" />}
+            value={stats.avgRating}
+            label="Rating medio"
+            delay={0.3}
+          />
+          <StatCard
+            icon={<Eye className="w-4 h-4 text-[#DEBFC3]" />}
+            value={stats.totalEpisodes}
+            label="Episodios"
+            delay={0.32}
+          />
+          <StatCard
+            icon={<BookmarkCheck className="w-4 h-4 text-[#9B8E8F]" />}
+            value={stats.watchingItems}
+            label="En curso"
+            delay={0.34}
+          />
+          {(stats.totalCrimes !== undefined) && (
+            <StatCard
+              icon={<Skull className="w-4 h-4 text-red-400" />}
+              value={stats.totalCrimes}
+              label="Delitos totales"
+              delay={0.36}
+              accent="#EF4444"
+            />
+          )}
         </div>
       </div>
 
       {/* Charts */}
       <div className="px-4">
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {/* Genre Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.35 }}
             className="p-6 rounded-xl bg-[#291C1E]/40 border border-[#4F4445]/30"
           >
-            <BarChart data={stats.statusDistribution} title="Distribución por Estado" />
+            <BarChart
+              data={genreData.slice(0, 8).map((g, i) => ({
+                label: g.label,
+                value: g.value,
+                color: [
+                  "#8B5CF6", "#EF4444", "#FFD65B", "#EC4899",
+                  "#10B981", "#F59E0B", "#06B6D4", "#DEBFC3",
+                ][i % 8],
+              }))}
+              title="Géneros favoritos"
+            />
           </motion.div>
 
+          {/* Type Distribution */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="p-6 rounded-xl bg-[#291C1E]/40 border border-[#4F4445]/30"
+            className="p-6 rounded-xl bg-[#291C1E]/40 border border-[#4F4445]/30 flex flex-col justify-between gap-6"
           >
-            <BarChart data={stats.typeDistribution} title="Series vs Películas" />
+            <h3 className="text-sm font-medium text-[#DEBFC3] uppercase tracking-[0.15em] font-serif">
+              Series vs Películas
+            </h3>
+            <DonutChart data={stats.typeDistribution} />
           </motion.div>
+        </div>
+      </div>
+
+      {/* Status Distribution */}
+      <div className="px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="p-6 rounded-xl bg-[#291C1E]/40 border border-[#4F4445]/30 max-w-5xl mx-auto"
+        >
+          <BarChart data={stats.statusDistribution} title="Distribución por Estado" />
+        </motion.div>
+      </div>
+
+      {/* Criminals Section */}
+      {stats.totalCrimes !== undefined && (stats.totalCrimes > 0 || (stats.partnerCrimes || 0) > 0) && (
+        <>
+          <div className="px-4">
+            <ArtDecoLine />
+          </div>
+          <div className="px-4 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.48 }}
+              className="space-y-4"
+            >
+              <div className="text-center space-y-1">
+                <h2 className="text-xl font-bold text-red-400 font-serif">⚖️ El Marcador Criminal</h2>
+                <p className="text-xs text-[#4F4445]">Registro oficial de traiciones del Cineclub</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-5 rounded-xl bg-red-500/10 border border-red-500/25 text-center space-y-2">
+                  <Skull className="w-8 h-8 text-red-400 mx-auto" />
+                  <p className="text-3xl font-bold text-red-400 font-serif">{stats.totalCrimes}</p>
+                  <p className="text-xs text-[#9B8E8F]">Tus delitos</p>
+                </div>
+                <div className="p-5 rounded-xl bg-[#291C1E]/60 border border-[#4F4445]/30 text-center space-y-2">
+                  <Skull className="w-8 h-8 text-[#4F4445] mx-auto" />
+                  <p className="text-3xl font-bold text-[#DEBFC3] font-serif">{stats.partnerCrimes || 0}</p>
+                  <p className="text-xs text-[#4F4445]">Delitos de {stats.partnerName || "tu pareja"}</p>
+                </div>
+              </div>
+              {(stats.totalCrimes || 0) > (stats.partnerCrimes || 0) ? (
+                <div className="text-center p-3 rounded-xl bg-red-500/5 border border-red-500/20">
+                  <p className="text-xs text-red-400 font-serif italic">
+                    🚨 Atención: eres el más infame del Cineclub. La redención está en tus manos.
+                  </p>
+                </div>
+              ) : (stats.partnerCrimes || 0) > (stats.totalCrimes || 0) ? (
+                <div className="text-center p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                  <p className="text-xs text-emerald-400 font-serif italic">
+                    ✨ ¡Tu récord es intachable! Eres el cinéfilo más leal del cineclub.
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center p-3 rounded-xl bg-[#FFD65B]/5 border border-[#FFD65B]/20">
+                  <p className="text-xs text-[#FFD65B] font-serif italic">
+                    🤝 Empate perfecto — dos criminales del séptimo arte.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </>
+      )}
+
+      {/* Decorative Line */}
+      <div className="px-4">
+        <ArtDecoLine />
+      </div>
+
+      {/* Special Badges */}
+      <div className="px-4 max-w-5xl mx-auto space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center space-y-1"
+        >
+          <h2 className="text-xl font-bold text-[#FFD65B] font-serif">🏆 Logros Épicos</h2>
+          <p className="text-xs text-[#4F4445]">Hazañas legendarias del Cineclub</p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {specialBadges.map((badge, index) => (
+            <motion.div
+              key={badge.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.55 + index * 0.08 }}
+              className={`relative p-5 rounded-xl border text-center space-y-3 transition-all ${
+                badge.unlocked
+                  ? "bg-[#291C1E]/60 border-[#4F4445]/30"
+                  : "bg-[#1B1012]/40 border-[#4F4445]/20 opacity-40"
+              }`}
+            >
+              {badge.unlocked && (
+                <div
+                  className="absolute inset-x-0 top-0 h-0.5 rounded-t-xl"
+                  style={{ backgroundColor: badge.color }}
+                />
+              )}
+              <div
+                className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center ${
+                  badge.unlocked ? "" : "grayscale"
+                }`}
+                style={{ backgroundColor: badge.unlocked ? `${badge.color}25` : "#4F444520" }}
+              >
+                <div style={{ color: badge.unlocked ? badge.color : "#4F4445" }}>{badge.icon}</div>
+              </div>
+              <div>
+                <p className={`text-sm font-bold font-serif ${badge.unlocked ? "text-[#DEBFC3]" : "text-[#4F4445]"}`}>
+                  {badge.title}
+                </p>
+                <p className="text-[10px] text-[#4F4445] mt-1 leading-snug">{badge.description}</p>
+              </div>
+              {badge.unlocked && (
+                <div className="flex justify-center">
+                  <span
+                    className="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider"
+                    style={{ backgroundColor: `${badge.color}20`, color: badge.color }}
+                  >
+                    DESBLOQUEADO
+                  </span>
+                </div>
+              )}
+            </motion.div>
+          ))}
         </div>
       </div>
 
@@ -253,12 +584,12 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
         <ArtDecoLine />
       </div>
 
-      {/* Badges */}
+      {/* All Badges */}
       <div className="px-4 max-w-5xl mx-auto space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.65 }}
           className="text-center space-y-2"
         >
           <h2 className="text-xl font-bold text-[#DEBFC3] font-serif">Medallas y Logros</h2>
@@ -267,13 +598,13 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {badges.map((badge, index) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          {normalBadges.map((badge, index) => (
             <motion.div
               key={badge.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6 + index * 0.05 }}
+              transition={{ delay: 0.7 + index * 0.04 }}
               className={`relative p-4 rounded-xl border text-center space-y-2 transition-all ${
                 badge.unlocked
                   ? "bg-[#291C1E]/60 border-[#4F4445]/30"
@@ -318,7 +649,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.8 }}
             className="text-center"
           >
             <h2 className="text-xl font-bold text-[#DEBFC3] font-serif">Tus Favoritas</h2>
@@ -331,7 +662,7 @@ export function EstadisticasView({ stats }: EstadisticasViewProps) {
                 key={item.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 + index * 0.05 }}
+                transition={{ delay: 0.85 + index * 0.05 }}
               >
                 <Link
                   href={`/${item.id}`}

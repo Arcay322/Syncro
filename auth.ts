@@ -68,8 +68,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id
         token.email = user.email
         token.name = user.name
-        token.picture = user.image
       }
+      // CRITICAL: Strip picture from JWT token. 
+      // Base64 images will exceed the 8KB-16KB HTTP header limit and cause 431 errors.
+      if (token.picture) delete token.picture
+      if (token.image) delete token.image
+      
       return token
     },
     async session({ session, token }) {
@@ -77,7 +81,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.email = token.email as string
         session.user.name = token.name as string
-        session.user.image = token.picture as string | null
+        session.user.image = null // Always null in session to prevent bloat, components must fetch from DB
       }
       return session
     },

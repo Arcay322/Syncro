@@ -9,33 +9,27 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const member = await prisma.groupMember.findFirst({
+  const memberships = await prisma.groupMember.findMany({
     where: { userId: session.user.id },
-    include: { group: { include: { members: { include: { user: true } } } } },
+    include: {
+      group: {
+        include: {
+          members: {
+            include: { user: { select: { id: true, name: true, image: true } } },
+          },
+        },
+      },
+    },
   })
 
-  if (!member) {
-    return NextResponse.json({ group: null })
-  }
-
-  return NextResponse.json({ group: member.group })
+  const groups = memberships.map((m) => ({ ...m.group, role: m.role }))
+  return NextResponse.json({ groups })
 }
 
 export async function POST(request: Request) {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  // Check if user already in a group
-  const existing = await prisma.groupMember.findFirst({
-    where: { userId: session.user.id },
-  })
-  if (existing) {
-    return NextResponse.json(
-      { error: "Already in a group" },
-      { status: 400 }
-    )
   }
 
   const body = await request.json()

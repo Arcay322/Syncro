@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { getTmdbDetails } from "@/lib/tmdb"
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -47,6 +48,16 @@ export async function POST(request: Request) {
   }
 
   try {
+    let genres: string[] = []
+    try {
+      const tmdbData = await getTmdbDetails(tmdbId, mediaType as "movie" | "tv")
+      if (tmdbData && tmdbData.genres) {
+        genres = tmdbData.genres.map((g: any) => g.name)
+      }
+    } catch (err) {
+      console.error("Error fetching genres from TMDB:", err)
+    }
+
     const item = await prisma.watchlistItem.create({
       data: {
         tmdbId,
@@ -56,6 +67,7 @@ export async function POST(request: Request) {
         backdropPath: backdropPath || null,
         userId: groupId ? null : session.user.id,
         groupId: groupId || null,
+        genres,
       },
     })
     return NextResponse.json({ item }, { status: 201 })

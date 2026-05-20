@@ -21,17 +21,18 @@ interface GroupMember {
   }
 }
 
-interface GroupWithMembers {
+interface GroupWithRole {
   id: string
   name: string
   inviteCode: string
-  createdAt: Date
+  role: string
   members: GroupMember[]
 }
 
 interface DashboardProps {
   initialItems: WatchlistItemWithTmdb[]
-  group: GroupWithMembers | null
+  groups: GroupWithRole[]
+  activeGroupId: string | null
   userId: string
 }
 
@@ -49,11 +50,13 @@ function formatTimeAgo(date: Date): string {
   return new Date(date).toLocaleDateString("es", { day: "numeric", month: "short" })
 }
 
-export function Dashboard({ initialItems, group, userId }: DashboardProps) {
+export function Dashboard({ initialItems, groups, activeGroupId, userId }: DashboardProps) {
   const [items, setItems] = useState(initialItems)
   const [filter, setFilter] = useState<string>("ALL")
   const [searchOpen, setSearchOpen] = useState(false)
   const [rouletteOpen, setRouletteOpen] = useState(false)
+
+  const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null
 
   const handleItemUpdate = (updatedItem: WatchlistItemWithTmdb) => {
     setItems((prev) => prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)))
@@ -102,9 +105,11 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
     <div className="w-full px-6 lg:px-12 xl:px-16 py-10">
       {/* Header */}
       <div className="text-center mb-14">
-        <p className="text-[10px] tracking-[0.3em] uppercase text-[#9b8e8f] mb-3 font-medium">Nosotros y Series</p>
+        <p className="text-[10px] tracking-[0.3em] uppercase text-[#9b8e8f] mb-3 font-medium">
+          {activeGroup ? activeGroup.name : "Mi Biblioteca"}
+        </p>
         <h1 className="text-3xl md:text-4xl font-display font-semibold text-[#f4dde0] tracking-tight">
-          Nuestro sofá, nuestras series
+          {activeGroup ? `Sala compartida` : "Nuestro sofá, nuestras series"}
         </h1>
         <div className="deco-divider mt-5 max-w-xl mx-auto" />
       </div>
@@ -248,12 +253,8 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
               </p>
               
               {/* Slowly Rotating Film Projector Reel */}
-              <div className="relative mb-5">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                  className="w-20 h-20 rounded-full border-4 border-dashed border-[#ffd65b]/60 flex items-center justify-center bg-[#291c1e] shadow-[0_0_12px_rgba(255,214,91,0.15)] group-hover:scale-105 group-hover:border-[#ffd65b]/80 group-hover:shadow-[0_0_18px_rgba(255,214,91,0.25)] transition-all duration-300 relative animate-pulse"
-                >
+              <div className="relative mb-5 w-20 h-20 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-4 border-dashed border-[#ffd65b]/60 bg-[#291c1e] shadow-[0_0_12px_rgba(255,214,91,0.15)] group-hover:scale-105 group-hover:border-[#ffd65b]/80 group-hover:shadow-[0_0_18px_rgba(255,214,91,0.25)] transition-all duration-300 animate-[spin_8s_linear_infinite]">
                   {/* Inner spokes */}
                   <div className="absolute inset-1.5 rounded-full border border-[#ffd65b]/20 flex items-center justify-center">
                     <div className="w-0.5 h-full bg-[#ffd65b]/15 absolute transform rotate-0" />
@@ -261,8 +262,8 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
                     <div className="w-0.5 h-full bg-[#ffd65b]/15 absolute transform rotate-90" />
                     <div className="w-0.5 h-full bg-[#ffd65b]/15 absolute transform rotate-135" />
                   </div>
-                  <Clapperboard className="w-7 h-7 text-[#ffd65b] relative z-10 drop-shadow-[0_0_5px_rgba(255,214,91,0.3)] group-hover:rotate-12 transition-transform duration-300" />
-                </motion.div>
+                </div>
+                <Clapperboard className="w-7 h-7 text-[#ffd65b] relative z-10 drop-shadow-[0_0_5px_rgba(255,214,91,0.3)] group-hover:scale-110 transition-transform duration-300" />
                 
                 {/* Projected soft glow behind reel */}
                 <motion.div
@@ -323,9 +324,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
           </div>
 
           {/* Group Manager */}
-          <GroupManager group={group} onGroupChange={() => {
-            window.location.reload()
-          }} />
+          <GroupManager groups={groups} activeGroupId={activeGroupId} />
         </div>
       </div>
 
@@ -349,6 +348,7 @@ export function Dashboard({ initialItems, group, userId }: DashboardProps) {
         open={searchOpen}
         onOpenChange={setSearchOpen}
         onItemAdded={handleItemAdded}
+        groupId={activeGroupId ?? undefined}
       />
 
       <RouletteDialog
