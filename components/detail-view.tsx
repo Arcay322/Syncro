@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { getTmdbImageUrl } from "@/lib/tmdb"
@@ -21,7 +22,15 @@ import {
   Loader2,
   AlertTriangle,
   Skull,
+  Check,
+  Pause,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { WatchlistItemWithTmdb } from "@/types"
 
 interface DetailViewProps {
@@ -80,6 +89,7 @@ function StarRating({ value, onChange, size = "md" }: { value: number; onChange?
 }
 
 export function DetailView({ item, tmdbDetails }: DetailViewProps) {
+  const router = useRouter()
   const [currentItem, setCurrentItem] = useState(item)
   const [seasons] = useState<any[]>(tmdbDetails.seasons?.filter((s: any) => s.season_number > 0) || [])
   const [selectedSeason, setSelectedSeason] = useState(currentItem.currentSeason || 1)
@@ -93,7 +103,24 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
   const isTv = item.mediaType === "tv"
   const totalEpisodes = seasons.reduce((acc: number, s: any) => acc + (s.episode_count || 0), 0)
   const currentEp = currentItem.currentEpisode || 0
-  const watchedPercent = isTv && totalEpisodes > 0 ? Math.round((currentEp / totalEpisodes) * 100) : 0
+  const getWatchedEpisodesCount = () => {
+    if (!isTv) return 0
+    let count = 0
+    const currentSeason = currentItem.currentSeason || 1
+    const currentEpisode = currentItem.currentEpisode || 0
+    for (const s of seasons) {
+      if (s.season_number < currentSeason) {
+        count += s.episode_count || 0
+      } else if (s.season_number === currentSeason) {
+        count += currentEpisode
+      }
+    }
+    return count
+  }
+  const watchedEpCount = getWatchedEpisodesCount()
+  const watchedPercent = isTv && totalEpisodes > 0
+    ? (currentItem.status === "COMPLETED" ? 100 : Math.min(100, Math.round((watchedEpCount / totalEpisodes) * 100)))
+    : 0
 
   const fetchSeason = useCallback(
     async (seasonNumber: number) => {
@@ -127,6 +154,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
     if (res.ok) {
       const result = await res.json()
       setCurrentItem(result.item)
+      router.refresh()
     }
     setSaving(false)
   }
@@ -173,11 +201,14 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
 
   const handleEpisodeWatched = (episodeNumber: number) => {
     if (!isTv) return
-    const current = currentItem.currentEpisode || 0
-    if (episodeNumber > current) {
+    const isWatched =
+      selectedSeason < (currentItem.currentSeason || 1) ||
+      (selectedSeason === (currentItem.currentSeason || 1) && episodeNumber <= (currentItem.currentEpisode || 0))
+      
+    if (!isWatched) {
       updateItem({ currentSeason: selectedSeason, currentEpisode: episodeNumber })
-    } else if (episodeNumber === current) {
-      updateItem({ currentSeason: selectedSeason, currentEpisode: Math.max(0, current - 1) })
+    } else {
+      updateItem({ currentSeason: selectedSeason, currentEpisode: Math.max(0, episodeNumber - 1) })
     }
   }
 
@@ -310,6 +341,40 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                   {isTv ? "Reanudar Producción" : "Reanudar"}
                 </Button>
 
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <div
+                      className="flex h-10 select-none items-center justify-center rounded-lg border border-[#4F4445] bg-transparent px-5 text-xs font-semibold tracking-wide uppercase text-[#9B8E8F] hover:bg-[#291C1E] hover:text-[#DEBFC3] cursor-pointer transition-all duration-300 gap-2"
+                    >
+                      <span className="text-xs font-semibold tracking-wide uppercase">
+                        Estado: {statusLabels[currentItem.status] || currentItem.status}
+                      </span>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="bg-[#291C1E] border border-[#4F4445] min-w-[150px] rounded-md shadow-2xl z-30">
+                    {Object.entries(statusLabels).map(([key, label]) => {
+                      let Icon = Play
+                      if (key === "PLAN_TO_WATCH") Icon = Clock
+                      if (key === "COMPLETED") Icon = Check
+                      if (key === "ON_HOLD") Icon = Pause
+                      if (key === "DROPPED") Icon = Skull
+                      
+                      return (
+                        <DropdownMenuItem
+                          key={key}
+                          onClick={() => updateItem({ status: key })}
+                          className={`text-xs cursor-pointer hover:bg-[#DEBFC3]/10 py-2.5 px-3 flex items-center gap-2 ${
+                            currentItem.status === key ? "text-[#FFD65B] font-semibold bg-[#DEBFC3]/5" : "text-[#f4dde0]"
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          <span>{label}</span>
+                        </DropdownMenuItem>
+                      )
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Button
                   variant="outline"
                   onClick={() => setShowNotes(!showNotes)}
@@ -343,7 +408,7 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
                 <div className="space-y-2 max-w-xl">
                   <div className="flex justify-between text-xs text-[#9B8E8F]">
                     <span>Progreso</span>
-                    <span>{currentEp} / {totalEpisodes} episodios</span>
+                    <span>{watchedEpCount} / {totalEpisodes} episodios</span>
                   </div>
                   <div className="h-1.5 bg-[#291C1E] rounded-full overflow-hidden">
                     <div
@@ -528,8 +593,16 @@ export function DetailView({ item, tmdbDetails }: DetailViewProps) {
             ) : seasonEpisodes.length > 0 ? (
               seasonEpisodes.map((ep: any, index: number) => {
                 const epNum = ep.episode_number
-                const isWatched = (currentItem.currentEpisode || 0) >= epNum && (currentItem.currentSeason || 1) === selectedSeason
-                const isCurrentlyWatching = (currentItem.currentEpisode || 0) + 1 === epNum && (currentItem.currentSeason || 1) === selectedSeason
+                const currentSeasonData = seasons.find((s: any) => s.season_number === (currentItem.currentSeason || 1))
+                const totalInSeason = currentSeasonData?.episode_count || 0
+                
+                const isWatched =
+                  selectedSeason < (currentItem.currentSeason || 1) ||
+                  (selectedSeason === (currentItem.currentSeason || 1) && epNum <= (currentItem.currentEpisode || 0))
+                  
+                const isCurrentlyWatching =
+                  (selectedSeason === (currentItem.currentSeason || 1) && epNum === (currentItem.currentEpisode || 0) + 1) ||
+                  (selectedSeason === (currentItem.currentSeason || 1) + 1 && (currentItem.currentEpisode || 0) === totalInSeason && epNum === 1)
 
                 return (
                   <motion.div

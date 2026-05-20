@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -218,19 +218,85 @@ export function LibraryView({ initialItems }: LibraryViewProps) {
 
 function LibraryCard({ item, index }: { item: WatchlistItemWithTmdb; index: number }) {
   const statusLabel = statusLabels[item.status] || item.status
+  const currentSeason = item.currentSeason ?? 1
+  const currentEpisode = item.currentEpisode ?? 0
   const progressText =
-    item.mediaType === "tv" && item.currentSeason && item.currentEpisode
-      ? `T${item.currentSeason} · E${item.currentEpisode}`
+    item.mediaType === "tv"
+      ? `T${currentSeason} · E${currentEpisode}`
       : item.currentMinute
       ? `${Math.floor(item.currentMinute / 60)}h ${item.currentMinute % 60}m`
       : null
 
-  // Estimate rating bar width based on episode progress
-  const ratingWidth = item.currentEpisode
-    ? Math.min(20 + (item.currentEpisode * 5), 90)
-    : item.currentMinute
-    ? Math.min(20 + (item.currentMinute / 10), 90)
-    : 0
+  const [details, setDetails] = useState<{ seasons?: any[]; runtime?: number } | null>(null)
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const cacheKey = `tmdb_details_${item.mediaType}_${item.tmdbId}`
+        const cached = localStorage.getItem(cacheKey)
+        if (cached) {
+          setDetails(JSON.parse(cached))
+          return
+        }
+
+        const res = await fetch(`/api/tmdb/details?id=${item.tmdbId}&type=${item.mediaType}`)
+        if (res.ok) {
+          const data = await res.json()
+          const detailsData = {
+            seasons: data.seasons || null,
+            runtime: data.runtime || null,
+          }
+          localStorage.setItem(cacheKey, JSON.stringify(detailsData))
+          setDetails(detailsData)
+        }
+      } catch (error) {
+        console.error("Error fetching details", error)
+      }
+    }
+    fetchDetails()
+  }, [item.tmdbId, item.mediaType])
+
+  const getProgressWidth = () => {
+    if (item.status === "COMPLETED") return 100
+    if (item.status === "PLAN_TO_WATCH") return 0
+
+    if (item.mediaType === "movie") {
+      const currentMinute = item.currentMinute || 0
+      if (currentMinute === 0) return 0
+      
+      const runtime = details?.runtime || 120
+      return Math.min(100, Math.round((currentMinute / runtime) * 100))
+    } else {
+      // TV Series
+      const currentSeason = item.currentSeason || 1
+      const currentEpisode = item.currentEpisode || 0
+      
+      if (details?.seasons && details.seasons.length > 0) {
+        const filteredSeasons = details.seasons.filter((s: any) => s.season_number > 0)
+        let watched = 0
+        for (const s of filteredSeasons) {
+          if (s.season_number < currentSeason) {
+            watched += s.episode_count || 0
+          } else if (s.season_number === currentSeason) {
+            watched += currentEpisode
+          }
+        }
+        const total = filteredSeasons.reduce((acc: number, s: any) => acc + (s.episode_count || 0), 0)
+        if (watched === 0) return 0
+        if (total > 0) {
+          return Math.min(100, Math.round((watched / total) * 100))
+        }
+      }
+      
+      // Fallback to estimation if details are not yet loaded/available
+      const watchedEpisodes = (currentSeason - 1) * 10 + currentEpisode
+      if (watchedEpisodes === 0) return 0
+      const estimatedTotalEpisodes = Math.max(watchedEpisodes, currentSeason * 10)
+      return Math.min(100, Math.round((watchedEpisodes / estimatedTotalEpisodes) * 100))
+    }
+  }
+
+  const ratingWidth = getProgressWidth()
 
   return (
     <motion.div
