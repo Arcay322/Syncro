@@ -109,7 +109,7 @@ export function Dashboard({ initialItems, groups, activeGroupId, userId }: Dashb
           {activeGroup ? activeGroup.name : "Mi Biblioteca"}
         </p>
         <h1 className="text-3xl md:text-4xl font-display font-semibold text-[#f4dde0] tracking-tight">
-          {activeGroup ? `Sala compartida` : "Nuestro sofá, nuestras series"}
+          {activeGroup ? "Viendo el mundo a la vez" : "Nuestro sofá, nuestras series"}
         </h1>
         <div className="deco-divider mt-5 max-w-xl mx-auto" />
       </div>
@@ -335,7 +335,7 @@ export function Dashboard({ initialItems, groups, activeGroupId, userId }: Dashb
             <span className="font-display text-sm font-semibold tracking-[0.15em] text-[#f4dde0] uppercase">Syncro</span>
           </div>
           <p className="text-[10px] text-[#9b8e8f] tracking-[0.15em] uppercase">
-            Cinematic Studios · Creado para amar y binge
+            Organizando nuestras historias
           </p>
           <div className="flex gap-6">
             <span className="text-[10px] text-[#9b8e8f] hover:text-[#f4dde0] cursor-pointer transition-colors tracking-wider uppercase">Archivo</span>
